@@ -11,100 +11,29 @@
 <body>
 
 <!-- The book's cover. Full-bleed image, replaceable, never mandatory. -->
-<section class="cover" id="cover" aria-label="Cover">
+<section class="cover cover--imageless" id="cover" aria-label="Cover">
   <div class="cover__inner">
     <h1 class="cover__title" id="cover-title">The Compendium</h1>
     <div class="cover__rule" aria-hidden="true"></div>
     <p class="cover__subtitle" id="cover-subtitle"></p>
   </div>
   <div class="cover__actions">
-    <button class="btn btn--primary" id="open-book">Open</button>
-    <label class="btn btn--icon" title="Replace the cover image">
-      ⛭<input type="file" accept="image/*" id="cover-file" class="visually-hidden">
-      <span class="visually-hidden">Replace the cover image</span>
-    </label>
+    <button class="btn btn--primary" id="open-book" type="button">Open</button>
+    <button class="btn btn--icon" id="to-settings" type="button" title="Settings" aria-label="Settings">⛭</button>
   </div>
 </section>
 
-<main class="book" id="book" hidden>
-  <header class="book__header">
-    <p class="book__eyebrow">Stage One · Data Layer</p>
-    <h1>Foundations</h1>
-    <p class="dim">Storage, autosave, trash and undo, export and import. Prove this holds
-      before anything is built on top of it.</p>
-  </header>
+<div id="app" hidden>
+  <main class="book" id="view" tabindex="-1"></main>
 
-  <div class="banner" id="backup-banner" hidden>
-    <p id="backup-banner-text"></p>
-    <button class="btn btn--primary" data-action="export">Export a backup</button>
-  </div>
-
-  <section class="section">
-    <h2>The world</h2>
-    <div class="sheet stack">
-      <label class="stack">
-        <span class="faint mono">TITLE</span>
-        <input class="field" id="world-title" type="text" autocomplete="off">
-      </label>
-      <label class="stack">
-        <span class="faint mono">SUBTITLE</span>
-        <input class="field" id="world-subtitle" type="text" autocomplete="off">
-      </label>
-      <p class="faint mono" id="storage-line">&nbsp;</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>What is stored</h2>
-    <div class="counts" id="counts"></div>
-  </section>
-
-  <section class="section">
-    <h2>Reckonings</h2>
-    <p class="dim">One canonical year per event; every reckoning is a label applied at
-      display time. Add a third and the table below gains a column.</p>
-    <div class="sheet">
-      <table class="years" id="reckoning-table"></table>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Backup</h2>
-    <div class="row">
-      <button class="btn btn--primary" data-action="export">Export everything</button>
-      <label class="btn">Import…<input type="file" accept="application/json,.json" id="import-file" class="visually-hidden"></label>
-      <button class="btn" data-action="seed">Add sample records</button>
-    </div>
-    <p class="faint mono" id="backup-line">&nbsp;</p>
-  </section>
-
-  <section class="section">
-    <h2>Trash <span class="faint mono" id="trash-count"></span></h2>
-    <div class="sheet">
-      <ul class="list" id="trash-list"></ul>
-    </div>
-    <div class="row" style="margin-top:var(--gap-3)">
-      <button class="btn" data-action="undo" id="undo-btn" disabled>Undo</button>
-    </div>
-  </section>
-
-  <section class="section">
-    <h2>Self-test</h2>
-    <p class="dim">Runs the whole data layer against this browser's own storage. It takes a
-      full backup first and restores it afterwards, so it is safe to run on a real world.</p>
-    <div class="row">
-      <button class="btn btn--primary" data-action="selftest">Run <span id="test-count"></span> checks</button>
-    </div>
-    <pre class="log" id="test-log" hidden></pre>
-  </section>
-
-  <section class="section">
-    <h2>Danger</h2>
-    <div class="row">
-      <button class="btn btn--danger" data-action="reset">Erase this world</button>
-    </div>
-  </section>
-</main>
+  <nav class="tabbar" aria-label="Sections">
+    <button class="tabbar__btn" id="to-cover" type="button">Cover</button>
+    <button class="tabbar__btn" id="to-contents" type="button">Contents</button>
+    <a class="tabbar__btn" href="#/characters">Characters</a>
+    <a class="tabbar__btn" href="#/timeline">Timeline</a>
+    <a class="tabbar__btn" href="#/settings">Settings</a>
+  </nav>
+</div>
 
 <div class="saver" id="saver" data-state="idle" role="status" aria-live="polite">
   <span class="saver__dot" aria-hidden="true"></span><span id="saver-text">Ready</span>

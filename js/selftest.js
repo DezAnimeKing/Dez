@@ -12,6 +12,7 @@ import * as store from './store.js';
 import * as db from './db.js';
 import * as backup from './backup.js';
 import { makePage, makeRelationship, STATUS, DEV_TIER, CAST_TIER } from './schema.js';
+import { parseBatch } from './markdown.js';
 import {
   DEFAULT_RECKONINGS, toDisplayYear, toCanonicalYear, convertYear,
   formatYear, parseYearInput, withinRange,
@@ -231,6 +232,68 @@ test('a third reckoning needs no code change', async () => {
   const added = await store.createReckoning({ name: 'Kindling Reckoning', abbr: 'KR', offsetFromCanonicalZero: -120 });
   assertEqual(convertYear(666, FALL, added), 786, 'A newly defined reckoning relabels existing years immediately');
   await store.remove('reckonings', added.id);
+});
+
+test('sealed pages are walled off until the setting reveals them', async () => {
+  await store.reset();
+  await store.createPage({ type: 'character', title: 'In the world' });
+  await store.createPage({ type: 'character', title: 'Quarantined', devTier: DEV_TIER.SEALED });
+
+  const visible = await store.queryPages({ type: 'character' });
+  assertEqual(visible.map((p) => p.title), ['In the world'], 'A sealed page should not appear in a list');
+  assertEqual((await store.queryPages({ type: 'character', query: 'quarantined' })).length, 0,
+    'A sealed page should not be findable by search');
+  assertEqual((await store.queryPages({ type: 'character', tier: DEV_TIER.SEALED })).map((p) => p.title), ['Quarantined'],
+    'Asking for the sealed tier explicitly should still show it');
+
+  assertEqual((await store.recent()).map((p) => p.title), ['In the world'],
+    'A sealed page should not surface in "recently edited" either');
+
+  await store.updateWorld({ revealSealed: true });
+  assertEqual((await store.queryPages({ type: 'character' })).length, 2, 'Revealing sealed content should show it everywhere');
+  assertEqual((await store.recent()).length, 2, 'Including in "recently edited"');
+  await store.updateWorld({ revealSealed: false });
+});
+
+test('search reaches into block text, aliases and summaries', async () => {
+  await store.reset();
+  await store.createPage({
+    type: 'character', title: 'The First Vessel', aliases: ['She Who Was Kept'],
+    summary: 'Kept in a jar of river water.',
+    blocks: [{ kind: 'paragraph', text: 'The oxblood thread runs through her.' }],
+  });
+  const hit = async (q) => (await store.queryPages({ query: q })).length;
+  assertEqual(await hit('understudy'), 0, 'A word that appears nowhere should find nothing');
+  assertEqual(await hit('she who was kept'), 1, 'An alias should be searchable');
+  assertEqual(await hit('river water'), 1, 'A summary should be searchable');
+  assertEqual(await hit('oxblood thread'), 1, 'Block text should be searchable');
+  assertEqual(await hit('OXBLOOD'), 1, 'Search should ignore case');
+});
+
+test('a markdown batch lands as real pages with real statuses', async () => {
+  await store.reset();
+  const parsed = parseBatch([{
+    filename: 'cosmology.md',
+    text: '# Cosmology [CANON]\n\nSettled.\n\n## Open ground [OPEN]\n\nWhat breaks a Composite?',
+  }], { type: 'system', existingTitles: await store.existingTitles() });
+
+  const created = await store.importPages(parsed.map((r) => r.page));
+  assertEqual(created.length, 1, 'One file should become one page');
+  const stored = await store.getPage(created[0].id);
+  assertEqual(stored.title, 'Cosmology', 'The H1 becomes the title');
+  assertEqual(stored.status, 'CANON', 'The tag on the H1 rules the page');
+  assertEqual(stored.blocks.at(-1).status, 'OPEN', 'The tagged section rules its blocks');
+  assert(!stored.blocks.some((b) => b.text.includes('[')), 'Status tags are stripped from the prose');
+  assertEqual(stored.blocks.filter((b) => b.status === 'OPEN').length, 2,
+    'Both the section heading and its prose carry the section\'s status');
+  assertEqual((await store.stats()).openQuestions, 1,
+    'But only the prose counts as an open question — a heading is a section marker, not a ruling');
+
+  await store.updatePage(created[0].id, { devTier: DEV_TIER.SEALED });
+  const sealedStats = await store.stats();
+  assertEqual(sealedStats.openQuestions, 0, 'Sealing a page withdraws its open questions from the count');
+  assertEqual(sealedStats.sections.system.total, 0, 'And withdraws it from its section total');
+  assertEqual(sealedStats.sections.system.sealed, 1, 'While still being counted as sealed');
 });
 
 /* ------------------------------------------------------------- the runner */

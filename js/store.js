@@ -7,7 +7,7 @@
 
 import * as db from './db.js';
 import {
-  SCHEMA_VERSION, STATUS, STATUS_ORDER, DEV_TIER, PAGE_TYPE_ORDER,
+  SCHEMA_VERSION, STATUS, STATUS_ORDER, DEV_TIER, PAGE_TYPE_ORDER, CAST_TIER_ORDER,
   makePage, makeRelationship, makeEra, makeReckoning, makeImage, newId,
 } from './schema.js';
 import { DEFAULT_RECKONINGS, CANONICAL_RECKONING_ID } from './reckoning.js';
@@ -306,9 +306,66 @@ export async function undo() {
   return entry.label;
 }
 
+/* --------------------------------------------------------------- query */
+
+const matchable = (page) => [
+  page.title, ...(page.aliases || []), page.summary, ...(page.tags || []),
+  page.era, page.rulingFaction, page.themeMusic?.title,
+  ...(page.blocks || []).map((b) => b.text),
+].filter(Boolean).join('\n').toLowerCase();
+
+/**
+ * Filtered page list. Sealed pages are excluded everywhere unless the
+ * settings toggle reveals them, or the caller has explicitly asked for the
+ * sealed tier — quarantine that leaks is not quarantine.
+ */
+export async function queryPages({ type, query, status, castTier, tier, sort = 'title' } = {}) {
+  const pages = type ? await listPagesOfType(type) : await listPages();
+  const needle = query?.trim().toLowerCase();
+
+  const filtered = pages.filter((page) => {
+    if (page.devTier === DEV_TIER.SEALED && !world.revealSealed && tier !== DEV_TIER.SEALED) return false;
+    if (status && page.status !== status) return false;
+    if (castTier && page.castTier !== castTier) return false;
+    if (tier && page.devTier !== tier) return false;
+    if (needle && !matchable(page).includes(needle)) return false;
+    return true;
+  });
+
+  const collator = new Intl.Collator(undefined, { sensitivity: 'base' });
+  const sorters = {
+    title: (a, b) => collator.compare(a.title, b.title),
+    updated: (a, b) => (a.updatedAt < b.updatedAt ? 1 : -1),
+    year: (a, b) => (a.yearStart ?? Infinity) - (b.yearStart ?? Infinity),
+    cast: (a, b) => CAST_TIER_ORDER.indexOf(a.castTier) - CAST_TIER_ORDER.indexOf(b.castTier) || collator.compare(a.title, b.title),
+  };
+  return filtered.sort(sorters[sort] || sorters.title);
+}
+
+/** Titles already in use, for the markdown importer's duplicate check. */
+export async function existingTitles() {
+  return (await listPages()).map((p) => p.title);
+}
+
+/** Import parsed markdown pages in one pass, reporting what landed. */
+export async function importPages(pageDrafts) {
+  const created = [];
+  for (const draft of pageDrafts) created.push(makePage(draft));
+  await write(() => db.putMany(db.STORES.pages, created));
+  emit('change', { store: 'pages', action: 'import', count: created.length });
+  return created;
+}
+
 /* --------------------------------------------------------------- stats */
 
-/** Counts for the Contents page: per section, broken down by canon status. */
+/**
+ * Counts for the Contents page, per section and by canon status.
+ *
+ * Sealed pages are counted apart and left out of the totals unless the
+ * reveal setting is on: a section that says 3 must not show a list of 2.
+ * Their open blocks stay out of the open-question count for the same
+ * reason — quarantined material is not waiting on a ruling.
+ */
 export async function stats() {
   const [pages, images, trash, rels, eras, reckonings] = await Promise.all([
     listPages(), db.count(db.STORES.images), db.count(db.STORES.trash),
@@ -320,34 +377,52 @@ export async function stats() {
     sections[type] = { total: 0, sealed: 0, ...Object.fromEntries(STATUS_ORDER.map((s) => [s, 0])) };
   }
   let openBlocks = 0;
+  let openPages = 0;
   let principals = 0;
+  let visible = 0;
+  let sealed = 0;
 
   for (const page of pages) {
     const section = sections[page.type];
     if (!section) continue;
+
+    const isSealed = page.devTier === DEV_TIER.SEALED;
+    if (isSealed) {
+      section.sealed++;
+      sealed++;
+      if (!world.revealSealed) continue;
+    }
+
     section.total++;
     section[page.status]++;
-    if (page.devTier === DEV_TIER.SEALED) section.sealed++;
+    visible++;
     if (page.castTier === 'principal') principals++;
+    if (page.status === STATUS.OPEN) openPages++;
     for (const block of page.blocks || []) {
+      // A heading tagged OPEN marks a section, not a question — the
+      // question is the prose underneath it, and counting both would
+      // double it in the register.
+      if (block.kind === 'heading') continue;
       if ((block.status || page.status) === STATUS.OPEN) openBlocks++;
     }
   }
 
   return {
     sections,
-    pages: pages.length,
+    pages: visible,
+    sealedPages: sealed,
     images, trash, relationships: rels, eras, reckonings,
-    openQuestions: openBlocks + pages.filter((p) => p.status === STATUS.OPEN).length,
+    openQuestions: openBlocks + openPages,
     principals,
     lastBackupAt: world.lastBackupAt,
   };
 }
 
-/** Most recently touched pages, for the Contents page. */
+/** Most recently touched pages, for the Contents page. Sealed pages stay
+ *  out of it — a quarantine that surfaces in a "recently edited" list is
+ *  not a quarantine. */
 export async function recent(limit = 8) {
-  const pages = await listPages();
-  return pages.sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1)).slice(0, limit);
+  return (await queryPages({ sort: 'updated' })).slice(0, limit);
 }
 
 export async function markBackedUp() {
