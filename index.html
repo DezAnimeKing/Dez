@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0d0f">
+<title>The Compendium</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- The book's cover. Full-bleed image, replaceable, never mandatory. -->
+<section class="cover cover--imageless" id="cover" aria-label="Cover">
+  <div class="cover__inner">
+    <h1 class="cover__title" id="cover-title">The Compendium</h1>
+    <div class="cover__rule" aria-hidden="true"></div>
+    <p class="cover__subtitle" id="cover-subtitle"></p>
+  </div>
+  <div class="cover__actions">
+    <button class="btn btn--primary" id="open-book" type="button">Open</button>
+    <button class="btn btn--icon" id="to-settings" type="button" title="Settings" aria-label="Settings">⛭</button>
+  </div>
+</section>
+
+<div id="app" hidden>
+  <main class="book" id="view" tabindex="-1"></main>
+
+  <nav class="tabbar" aria-label="Sections">
+    <button class="tabbar__btn" id="to-cover" type="button">Cover</button>
+    <button class="tabbar__btn" id="to-contents" type="button">Contents</button>
+    <a class="tabbar__btn" href="#/characters">Characters</a>
+    <a class="tabbar__btn" href="#/timeline">Timeline</a>
+    <a class="tabbar__btn" href="#/settings">Settings</a>
+  </nav>
+</div>
+
+<div class="saver" id="saver" data-state="idle" role="status" aria-live="polite">
+  <span class="saver__dot" aria-hidden="true"></span><span id="saver-text">Ready</span>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
