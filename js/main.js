@@ -67,15 +67,28 @@ addEventListener('cover-changed', paintCover);
 
 /* ----------------------------------------------------------------- routes */
 
-const withChrome = (fn) => async (params) => {
-  if (bookOpen) { $('cover').hidden = true; $('app').hidden = false; }
-  window.scrollTo({ top: 0 });
-  try {
-    await fn(view(), params);
-  } catch (err) {
-    console.error(err);
-    view().replaceChildren(el('div', 'sheet', `This view failed to render: ${err.message}`));
-  }
+/* Views clear the container and then await their data, so two renders that
+ * overlap would interleave and paint the page twice. Renders are therefore
+ * queued, and a render that has been superseded before it starts is
+ * dropped rather than drawn. */
+let navSeq = 0;
+let rendering = Promise.resolve();
+
+const withChrome = (fn) => (params) => {
+  const mine = ++navSeq;
+  // .catch first: one failed render must never freeze every later one.
+  rendering = rendering.catch(() => {}).then(async () => {
+    if (mine !== navSeq) return;
+    if (bookOpen) { $('cover').hidden = true; $('app').hidden = false; }
+    window.scrollTo({ top: 0 });
+    try {
+      await fn(view(), params);
+    } catch (err) {
+      console.error(err);
+      view().replaceChildren(el('div', 'sheet', `This view failed to render: ${err.message}`));
+    }
+  });
+  return rendering;
 };
 
 router.route('/', withChrome((container) => contents.render(container)));
@@ -87,6 +100,8 @@ router.route('/story', withChrome((container) => collection.renderPlaceholder(co
 router.route('/gallery', withChrome((container) => collection.renderPlaceholder(container, 'image')));
 router.route('/settings', withChrome((container) => settings.render(container)));
 router.route('/page/:id', withChrome((container, params) => pageView.render(container, params.id)));
+// [[Page#Heading]] arrives here: the same page, scrolled to that heading.
+router.route('/page/:id/:anchor', withChrome((container, params) => pageView.render(container, params.id, params.anchor)));
 router.fallback(() => router.go('/', { replace: true }));
 
 /* ------------------------------------------------------------------- boot */
@@ -105,10 +120,14 @@ async function boot() {
   $('to-settings').addEventListener('click', () => router.go('/settings'));
   $('to-contents').addEventListener('click', () => router.go('/'));
 
-  // A deep link — a bookmarked page — opens the book at that page.
-  if (location.hash && location.hash !== '#/') bookOpen = true;
+  // A deep link — a bookmarked page — opens the book at that page. The
+  // chrome is revealed directly: router.start() does the one resolve.
+  if (location.hash && location.hash !== '#/') {
+    bookOpen = true;
+    $('cover').hidden = true;
+    $('app').hidden = false;
+  }
   router.start();
-  if (bookOpen) openBook();
 }
 
 addEventListener('pagehide', () => { store.flush(); });

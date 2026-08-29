@@ -277,3 +277,29 @@ test('slugs are stable and url-safe', () => {
   assert.equal(slugify('The Seven Modes'), 'the-seven-modes');
   assert.equal(slugify('Fall 666 — the Unhoming?'), 'fall-666-the-unhoming');
 });
+
+/* ---------------------------------------------------------------- options */
+
+test('front matter can be turned off and is then kept as text', () => {
+  const source = '---\ntitle: Overridden\ntype: character\n---\n\n# The Real Title\n\nBody.';
+  const on = parseMarkdown(source, { type: 'system' });
+  assert.equal(on.page.title, 'Overridden');
+  assert.equal(on.page.type, 'character');
+
+  const off = parseMarkdown(source, { type: 'system', frontMatter: false });
+  assert.equal(off.page.title, 'The Real Title', 'the H1 is the title again');
+  assert.equal(off.page.type, 'system', 'and the type chosen at import stands');
+  assert.match(off.warnings.join(' '), /left as body text/);
+  assert.ok(off.page.blocks.some((b) => b.text.includes('title: Overridden')), 'nothing is dropped');
+});
+
+test('section inheritance can be turned off, leaving the tag on the heading alone', () => {
+  const source = '# T\n\n## Settled [CANON]\n\nUnder settled.\n\n[OPEN] Its own tag still counts.';
+  const on = parseMarkdown(source);
+  assert.equal(on.page.blocks[1].status, 'CANON', 'by default the section rules its blocks');
+
+  const off = parseMarkdown(source, { sectionTags: false });
+  assert.equal(off.page.blocks[0].status, 'CANON', 'the tagged heading keeps its own status');
+  assert.equal(off.page.blocks[1].status, null, 'but no longer rules what follows');
+  assert.equal(off.page.blocks[2].status, 'OPEN', 'a block with its own tag is unaffected');
+});

@@ -364,3 +364,71 @@ textarea.field { resize: vertical; overflow: hidden; }
 .log__ok { color: var(--verdigris-soft); }
 .log__fail { color: var(--oxblood-soft); }
 .log__note { color: var(--vellum-faint); }
+
+.option { gap: var(--gap-1); }
+.option__hint { margin: 0 0 0 2rem; font-size: 0.85rem; }
+
+/* ------------------------------------------------------------ wiki links */
+
+/* A link is highlighted text, not a button: it has to survive being read
+ * inside a paragraph without shouting. A broken one has to shout. */
+.wikilink {
+  color: var(--verdigris-soft);
+  text-decoration: none;
+  background: linear-gradient(transparent 62%, rgba(77, 139, 131, 0.28) 62%);
+  padding: 0 0.08em;
+  border-radius: 1px;
+  cursor: pointer;
+}
+.wikilink:hover, .wikilink:focus-visible { background: rgba(77, 139, 131, 0.32); color: var(--vellum); }
+.wikilink--broken, .wikilink--anchor-broken {
+  color: var(--oxblood-soft);
+  background: linear-gradient(transparent 62%, rgba(140, 47, 49, 0.3) 62%);
+  text-decoration: underline wavy var(--oxblood);
+  text-underline-offset: 0.22em;
+}
+
+/* A heading a link aimed at, marked briefly on arrival. */
+.anchor-arrived {
+  animation: arrived 2.4s ease-out both;
+  border-radius: 2px;
+}
+@keyframes arrived {
+  0%, 55% { background: rgba(201, 162, 39, 0.22); box-shadow: -0.4rem 0 0 rgba(201, 162, 39, 0.22); }
+  100% { background: transparent; box-shadow: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .anchor-arrived { animation: none; background: rgba(201, 162, 39, 0.18); }
+}
+
+.link-preview {
+  position: fixed; z-index: 28;
+  background: var(--ink-700); border: var(--rule); border-radius: var(--radius);
+  box-shadow: var(--shadow-sheet);
+  padding: var(--gap-3);
+  pointer-events: none;
+}
+.link-preview__title { font-family: var(--font-display); font-size: 1.02rem; }
+.link-preview__meta { color: var(--vellum-faint); margin-bottom: var(--gap-2); }
+.link-preview__body { margin: 0; font-size: 0.9rem; color: var(--vellum-dim); }
+
+/* ---------------------------------------------------------- autocomplete */
+
+.autocomplete {
+  position: relative; z-index: 22;
+  margin-top: 2px;
+  background: var(--ink-700); border: var(--rule); border-radius: var(--radius);
+  box-shadow: var(--shadow-sheet);
+  max-height: 15rem; overflow-y: auto;
+}
+.autocomplete__item {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
+  width: 100%; min-height: 44px; padding: var(--gap-2) var(--gap-3);
+  background: transparent; border: 0; border-bottom: var(--rule);
+  color: var(--vellum); text-align: left; font: inherit; cursor: pointer;
+}
+.autocomplete__item:last-child { border-bottom: 0; }
+.autocomplete__item--on, .autocomplete__item:hover { background: var(--ink-600); }
+.autocomplete__label { font-family: var(--font-display); letter-spacing: 0.02em; }
+.autocomplete__hint { color: var(--vellum-faint); }
+.backlinks { border-top: var(--rule); padding-top: var(--gap-5); }

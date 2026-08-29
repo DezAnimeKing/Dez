@@ -7,32 +7,40 @@ import * as db from '../db.js';
 import * as backup from '../backup.js';
 import * as selftest from '../selftest.js';
 import { parseBatch } from '../markdown.js';
+import { groupBroken } from '../links.js';
 import {
-  el, button, field, select, statusPill, confirmSheet, toast, plural, relativeTime,
+  el, button, field, select, statusPill, confirmSheet, openSheet, toast, plural, relativeTime,
 } from '../ui.js';
-import { go } from '../router.js';
+import { go, path } from '../router.js';
 import { PAGE_TYPE_ORDER, STATUS_ORDER } from '../schema.js';
 
 const titleCase = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 
 export async function render(container) {
   const world = store.getWorld();
-  container.replaceChildren();
+  const rerender = () => render(container);
 
+  // Built whole, then swapped in one go: a second render that arrives
+  // mid-build replaces this one rather than appending alongside it.
+  const page = document.createDocumentFragment();
   const header = el('header', 'book__header');
   header.append(el('p', 'book__eyebrow', 'Settings'));
   header.append(el('h1', null, 'The book itself'));
-  container.append(header);
+  page.append(header);
 
-  const rerender = () => render(container);
+  page.append(await worldSection(world, rerender));
+  page.append(backupSection(rerender));
+  page.append(markdownSection(rerender));
+  page.append(sealedSection(world, rerender));
+  page.append(await brokenLinksSection(rerender));
+  page.append(await trashSection(rerender));
+  page.append(selftestSection(rerender));
+  page.append(dangerSection(rerender));
 
-  container.append(await worldSection(world, rerender));
-  container.append(backupSection(rerender));
-  container.append(markdownSection(rerender));
-  container.append(sealedSection(world, rerender));
-  container.append(await trashSection(rerender));
-  container.append(selftestSection(rerender));
-  container.append(dangerSection(rerender));
+  // Settings re-renders itself after edits; if the author has navigated on
+  // in the meantime, this render is stale and must not overwrite the view.
+  if (path() !== '/settings') return;
+  container.replaceChildren(page);
 }
 
 const section = (title, ...children) => {
@@ -150,10 +158,17 @@ function markdownSection(rerender) {
   sheet.append(el('p', 'dim', 'Bring in existing .md files. Headings become blocks you can link to, '
     + 'and [CANON] / [PROPOSED] / [OPEN] / [SOURCE] tags in the text become real status tags.'));
 
-  let type = 'system';
+  const options = { type: 'system', frontMatter: true, sectionTags: true };
   sheet.append(select('Import these files as', PAGE_TYPE_ORDER.filter((t) => t !== 'image').map((t) => [t, `${titleCase(t)} pages`]),
-    type, (value) => { type = value; }));
-  sheet.append(el('p', 'faint mono', 'A `type:` line in a file’s front matter overrides this.'));
+    options.type, (value) => { options.type = value; }));
+
+  sheet.append(checkbox('Read YAML front matter', options.frontMatter,
+    'A --- block at the top sets title, type, status, tier, cast, aliases and tags. Off: it stays as body text.',
+    (on) => { options.frontMatter = on; }));
+
+  sheet.append(checkbox('A tag on a heading rules its section', options.sectionTags,
+    'On: [OPEN] on a heading marks every block under it until the next heading at that level. Off: it marks only the heading.',
+    (on) => { options.sectionTags = on; }));
 
   const preview = el('div', 'stack');
 
@@ -168,13 +183,27 @@ function markdownSection(rerender) {
     input.value = '';
     if (!files.length) return;
     const texts = await Promise.all(files.map(async (file) => ({ filename: file.name, text: await file.text() })));
-    const results = parseBatch(texts, { type, existingTitles: await store.existingTitles() });
+    const results = parseBatch(texts, { ...options, existingTitles: await store.existingTitles() });
     showPreview(results, preview, rerender);
   });
   label.append(input);
   sheet.append(label, preview);
 
   return section('Import markdown', sheet);
+}
+
+/** A labelled checkbox with the explanation the author needs to choose. */
+function checkbox(label, value, hint, onChange) {
+  const wrap = el('div', 'stack option');
+  const toggle = el('label', 'row toggle');
+  const box = el('input');
+  box.type = 'checkbox';
+  box.checked = value;
+  box.addEventListener('change', () => onChange(box.checked));
+  toggle.append(box, el('span', null, label));
+  wrap.append(toggle);
+  if (hint) wrap.append(el('p', 'faint option__hint', hint));
+  return wrap;
 }
 
 function showPreview(results, container, rerender) {
@@ -272,6 +301,61 @@ function sealedSection(world, rerender) {
   sheet.append(el('p', 'faint', 'Sealed pages are quarantined: out of every list, out of search, '
     + 'and out of link suggestions when those arrive. This switch reveals them everywhere.'));
   return section('Sealed content', sheet);
+}
+
+/* --------------------------------------------------------- broken links */
+
+/**
+ * Links that point at nothing — usually a page renamed after it was linked,
+ * or a heading that moved. Each one can be opened where it sits, or fixed
+ * on the spot by creating the page it was asking for.
+ */
+async function brokenLinksSection(rerender) {
+  const broken = groupBroken(await store.listBrokenLinks());
+  const sheet = el('div', 'sheet');
+
+  if (!broken.length) {
+    sheet.append(el('p', 'faint', 'Every link points at something.'));
+    return section('Broken links', sheet);
+  }
+
+  const list = el('ul', 'list');
+  for (const entry of broken) {
+    const li = el('li');
+    const left = el('div');
+    left.append(el('div', null, entry.broken === 'anchor'
+      ? `${entry.target} › ${entry.anchor}`
+      : entry.target));
+    const times = entry.count > 1 ? ` · linked ${entry.count} times` : '';
+    left.append(el('div', 'faint mono', entry.broken === 'anchor'
+      ? `on ${entry.from.title} · that page has no such heading${times}`
+      : `on ${entry.from.title} · no page has that name${times}`));
+
+    const actions = el('div', 'row');
+    actions.append(button('Open', {
+      className: 'btn btn--quiet',
+      onClick: () => go(`/page/${entry.from.id}`),
+    }));
+    if (entry.broken === 'page') {
+      actions.append(button('Create it', {
+        className: 'btn btn--quiet',
+        onClick: () => openSheet(`Create “${entry.target}” as…`,
+          PAGE_TYPE_ORDER.filter((t) => t !== 'image').map((type) => ({
+            label: `${titleCase(type)} page`,
+            onSelect: async () => {
+              const page = await store.createPage({ type, title: entry.target });
+              toast(`Created “${entry.target}”. The link points at it now.`);
+              go(`/page/${page.id}`);
+            },
+          }))),
+      }));
+    }
+    li.append(left, actions);
+    list.append(li);
+  }
+
+  sheet.append(list);
+  return section(`Broken links (${broken.length})`, sheet);
 }
 
 /* ----------------------------------------------------------------- trash */

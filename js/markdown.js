@@ -153,10 +153,22 @@ const prettifyFilename = (filename) => String(filename)
  * Markdown text → a page-shaped object ready for makePage(), plus the
  * counts and warnings the import preview shows before anything is written.
  */
-export function parseMarkdown(text, { filename = '', type = PAGE_TYPE.SYSTEM } = {}) {
+export function parseMarkdown(text, {
+  filename = '',
+  type = PAGE_TYPE.SYSTEM,
+  // Both default to on. They are options because they are judgement calls
+  // about the author's own conventions, not facts about markdown.
+  frontMatter = true,      // honour a YAML block: title, type, status, tier…
+  sectionTags = true,      // a tag on a heading rules its whole section
+} = {}) {
   const lines = String(text).replace(/\r\n?/g, '\n').split('\n');
-  const { meta, rest } = parseFrontMatter(lines);
+  const parsed = parseFrontMatter(lines);
+  const meta = frontMatter ? parsed.meta : {};
+  const rest = frontMatter ? parsed.rest : lines;
   const warnings = [];
+  if (!frontMatter && Object.keys(parsed.meta).length) {
+    warnings.push('Front matter left as body text, as asked.');
+  }
 
   const page = {
     type: isPageType(meta.type) ? meta.type : type,
@@ -212,7 +224,7 @@ export function parseMarkdown(text, { filename = '', type = PAGE_TYPE.SYSTEM } =
         continue;
       }
 
-      if (raw.level <= sectionLevel || status) {
+      if (sectionTags && (raw.level <= sectionLevel || status)) {
         sectionStatus = status;
         sectionLevel = status ? raw.level : 0;
       }
@@ -278,10 +290,10 @@ export function parseMarkdown(text, { filename = '', type = PAGE_TYPE.SYSTEM } =
 }
 
 /** Parse a batch, flagging titles that collide with each other or with existing pages. */
-export function parseBatch(files, { type, existingTitles = [] } = {}) {
+export function parseBatch(files, { type, existingTitles = [], frontMatter = true, sectionTags = true } = {}) {
   const taken = new Set(existingTitles.map((t) => t.toLowerCase()));
   return files.map(({ filename, text }) => {
-    const result = parseMarkdown(text, { filename, type });
+    const result = parseMarkdown(text, { filename, type, frontMatter, sectionTags });
     const key = result.page.title.toLowerCase();
     result.filename = filename;
     result.duplicate = taken.has(key);

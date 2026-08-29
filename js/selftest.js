@@ -200,6 +200,25 @@ test('export and re-import restore the world exactly, images included', async ()
   assertEqual(restoredImage.caption, 'exported pixel', 'Captions survive too');
 });
 
+test('links resolve against the restored world, not the one before it', async () => {
+  await store.reset();
+  const quarter = await store.createPage({ type: 'region', title: 'The Drowned Quarter' });
+  await store.createPage({
+    type: 'character', title: 'The First Vessel',
+    blocks: [{ kind: 'paragraph', text: 'She met [[The Drowned Quarter]].' }],
+  });
+  const payload = JSON.parse(await backup.exportJSON());
+
+  // Delete the target, then restore the backup that still contains it.
+  await store.remove('pages', quarter.id);
+  assertEqual((await store.listBrokenLinks()).length, 1, 'Deleting the target breaks the link');
+
+  await backup.importSnapshot(payload, { mode: 'replace' });
+  await store.init();
+  assertEqual((await store.listBrokenLinks()).length, 0,
+    'After a restore the link graph is rebuilt, so a live link is not shown as broken');
+});
+
 test('a truncated or foreign backup is refused, not half-restored', async () => {
   const page = await store.createPage({ type: 'character', title: 'Still here' });
   const payload = JSON.parse(await backup.exportJSON());
@@ -294,6 +313,60 @@ test('a markdown batch lands as real pages with real statuses', async () => {
   assertEqual(sealedStats.openQuestions, 0, 'Sealing a page withdraws its open questions from the count');
   assertEqual(sealedStats.sections.system.total, 0, 'And withdraws it from its section total');
   assertEqual(sealedStats.sections.system.sealed, 1, 'While still being counted as sealed');
+});
+
+test('links are recomputed from the body, and backlinks follow', async () => {
+  await store.reset();
+  const quarter = await store.createPage({ type: 'region', title: 'The Drowned Quarter' });
+  const vessel = await store.createPage({
+    type: 'character', title: 'The First Vessel',
+    blocks: [{ kind: 'paragraph', text: 'She met [[The Drowned Quarter]] in a dream.' }],
+  });
+
+  assertEqual((await store.getPage(vessel.id)).links, [{ target: 'The Drowned Quarter', anchor: null }],
+    'A link in the body is recorded as an outgoing link');
+  assertEqual((await store.backlinksFor(quarter.id)).map((b) => b.from.id), [vessel.id],
+    'And the target gains a backlink');
+
+  await store.updatePage(vessel.id, { blocks: [{ kind: 'paragraph', text: 'She met nobody.' }] });
+  assertEqual((await store.getPage(vessel.id)).links, [], 'Deleting the link deletes the record of it');
+  assertEqual((await store.backlinksFor(quarter.id)).length, 0, 'And the backlink goes with it');
+});
+
+test('renaming a page breaks the links that named it, visibly', async () => {
+  await store.reset();
+  const quarter = await store.createPage({ type: 'region', title: 'The Drowned Quarter' });
+  await store.createPage({
+    type: 'character', title: 'The First Vessel',
+    blocks: [{ kind: 'paragraph', text: 'She met [[The Drowned Quarter]].' }],
+  });
+  assertEqual((await store.listBrokenLinks()).length, 0, 'A link that resolves is not broken');
+
+  await store.updatePage(quarter.id, { title: 'The Quarter, Drowned' });
+  const broken = await store.listBrokenLinks();
+  assertEqual(broken.length, 1, 'A rename breaks the links that named the old title');
+  assertEqual(broken[0].target, 'The Drowned Quarter', 'And the maintenance view says which name is missing');
+
+  await store.updatePage(quarter.id, { aliases: ['The Drowned Quarter'] });
+  assertEqual((await store.listBrokenLinks()).length, 0, 'Keeping the old name as an alias mends it');
+});
+
+test('a link to a heading knows whether that heading is still there', async () => {
+  await store.reset();
+  const target = await store.createPage({
+    type: 'system', title: 'Cosmology',
+    blocks: [{ kind: 'heading', text: 'The Seven Modes', anchor: 'the-seven-modes' }],
+  });
+  await store.createPage({
+    type: 'character', title: 'A reader',
+    blocks: [{ kind: 'paragraph', text: 'See [[Cosmology#The Seven Modes]].' }],
+  });
+  assertEqual((await store.listBrokenLinks()).length, 0, 'A heading that exists resolves');
+
+  await store.updatePage(target.id, { blocks: [{ kind: 'heading', text: 'The Modes', anchor: 'the-modes' }] });
+  const broken = await store.listBrokenLinks();
+  assertEqual(broken.length, 1, 'Renaming the heading breaks the link into it');
+  assertEqual(broken[0].broken, 'anchor', 'And it is reported as an anchor break, not a missing page');
 });
 
 /* ------------------------------------------------------------- the runner */

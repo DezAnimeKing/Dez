@@ -11,6 +11,7 @@ import {
   makePage, makeRelationship, makeEra, makeReckoning, makeImage, newId,
 } from './schema.js';
 import { DEFAULT_RECKONINGS, CANONICAL_RECKONING_ID } from './reckoning.js';
+import { linksIn, buildIndex, buildBacklinks, brokenLinks } from './links.js';
 
 /* --------------------------------------------------------------- events */
 
@@ -23,6 +24,7 @@ export function on(event, fn) {
 }
 
 function emit(event, detail) {
+  if (event === 'change') linkCache = null;
   for (const fn of listeners.get(event) || []) {
     try { fn(detail); } catch (err) { console.error(`listener for "${event}" threw`, err); }
   }
@@ -58,6 +60,8 @@ async function write(fn) {
 
 /* --------------------------------------------------------------- world */
 
+let linkCache = null;
+
 const META_KEY = 'world';
 
 const DEFAULT_WORLD = Object.freeze({
@@ -84,8 +88,15 @@ export async function updateWorld(patch) {
   return getWorld();
 }
 
-/** Open the database, seeding a fresh world on first run. */
+/**
+ * Open the database, seeding a fresh world on first run.
+ *
+ * Also the door back in after an import: a restore writes straight to the
+ * database, so anything derived from it — the link graph above all — has
+ * to be dropped here, or live links would render as broken.
+ */
 export async function init() {
+  linkCache = null;
   const existing = await db.get(db.STORES.meta, META_KEY);
   if (existing) {
     world = { ...DEFAULT_WORLD, ...existing };
@@ -101,6 +112,7 @@ export async function init() {
   }
 
   await db.requestPersistence().catch(() => {});
+  emit('change', { store: 'meta', action: 'reload' });
   emit('ready', getWorld());
   return getWorld();
 }
@@ -113,6 +125,7 @@ export const listPagesOfType = (type) => db.getAllByIndex(db.STORES.pages, 'type
 
 export async function createPage(patch = {}) {
   const page = makePage(patch);
+  page.links = linksIn(page);
   await write(() => db.put(db.STORES.pages, page));
   emit('change', { store: 'pages', id: page.id, action: 'create' });
   return page;
@@ -123,6 +136,9 @@ export async function updatePage(id, patch) {
   const current = await getPage(id);
   if (!current) throw new Error(`No page ${id}`);
   const next = { ...current, ...patch, id: current.id, type: current.type, updatedAt: new Date().toISOString() };
+  // Outgoing links are derived from the body, never edited directly, so a
+  // deleted [[link]] stops counting as a link the moment it is deleted.
+  next.links = linksIn(next);
   await write(() => db.put(db.STORES.pages, next));
   emit('change', { store: 'pages', id, action: 'update' });
   return next;
@@ -350,10 +366,41 @@ export async function existingTitles() {
 /** Import parsed markdown pages in one pass, reporting what landed. */
 export async function importPages(pageDrafts) {
   const created = [];
-  for (const draft of pageDrafts) created.push(makePage(draft));
+  for (const draft of pageDrafts) {
+    const page = makePage(draft);
+    page.links = linksIn(page);
+    created.push(page);
+  }
   await write(() => db.putMany(db.STORES.pages, created));
   emit('change', { store: 'pages', action: 'import', count: created.length });
   return created;
+}
+
+/* --------------------------------------------------------------- links */
+
+/**
+ * Title index and backlinks for the whole world, rebuilt on demand and
+ * dropped whenever anything changes. Links resolve at render time rather
+ * than at save time, so a rename shows up as a broken link immediately
+ * instead of leaving a stale id pointing at the wrong page.
+ */
+export async function linkGraph() {
+  if (linkCache) return linkCache;
+  const pages = await listPages();
+  const index = buildIndex(pages);
+  linkCache = { pages, index, backlinks: buildBacklinks(pages, index) };
+  return linkCache;
+}
+
+export async function backlinksFor(pageId) {
+  const { backlinks } = await linkGraph();
+  return backlinks.get(pageId) || [];
+}
+
+/** Every link pointing at nothing, for the maintenance view. */
+export async function listBrokenLinks() {
+  const { pages, index } = await linkGraph();
+  return brokenLinks(pages, index);
 }
 
 /* --------------------------------------------------------------- stats */

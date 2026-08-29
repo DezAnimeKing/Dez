@@ -7,7 +7,7 @@
 
 import * as store from '../store.js';
 import { el, button, statusPill, relativeTime, plural, openSheet } from '../ui.js';
-import { go } from '../router.js';
+import { go, path } from '../router.js';
 import { STATUS_ORDER, STATUS_META, CAST_TIER_ORDER, DEV_TIER_ORDER } from '../schema.js';
 import { SECTIONS, newPage } from './contents.js';
 
@@ -103,6 +103,7 @@ export async function render(container, type) {
     }));
 
     const pages = await store.queryPages({ type, ...filters });
+    if (!results.isConnected) return;  // navigated away mid-search
     results.replaceChildren();
 
     if (!pages.length) {

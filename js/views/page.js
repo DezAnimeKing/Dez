@@ -10,19 +10,28 @@ import {
   el, frag, button, field, select, statusPill, statusControl,
   openSheet, confirmSheet, toast, autogrow, relativeTime,
 } from '../ui.js';
-import { go, back } from '../router.js';
+import { go, back, path } from '../router.js';
 import {
   STATUS_META, CAST_TIER_ORDER, DEV_TIER_ORDER, PAGE_TYPE, makeBlock,
 } from '../schema.js';
 import { slugify } from '../markdown.js';
+import {
+  renderText, attachLinkAutocomplete, backlinksSection, revealAnchor,
+} from './linking.js';
 
 const titleCase = (s) => String(s).charAt(0).toUpperCase() + String(s).slice(1);
 const BLOCK_KINDS = [['paragraph', 'Paragraph'], ['heading', 'Heading'], ['quote', 'Quote'], ['list', 'List'], ['table', 'Table'], ['code', 'Code']];
 
 const editing = new Set(); // page ids currently open in edit mode
 
-export async function render(container, id) {
-  const page = await store.getPage(id);
+/** Is this page still the one on screen? */
+const onThisPage = (id) => path().startsWith(`/page/${id}`);
+
+export async function render(container, id, anchor = null) {
+  const [page, graph] = await Promise.all([store.getPage(id), store.linkGraph()]);
+  // This view re-renders itself after edits, so it may finish after the
+  // author has already navigated elsewhere. Paint only if still on it.
+  if (!onThisPage(id)) return;
   container.replaceChildren();
 
   if (!page) {
@@ -41,7 +50,13 @@ export async function render(container, id) {
   const rerender = () => render(container, id);
 
   container.append(header(page, { isEditing, rerender, container }));
-  container.append(isEditing ? editor(page, save, rerender) : reader(page, rerender));
+  container.append(isEditing ? editor(page, save, rerender) : reader(page, rerender, graph));
+
+  const backlinks = await backlinksSection(page.id);
+  if (backlinks && onThisPage(id)) container.append(backlinks);
+
+  // Arriving from [[Page#Heading]]: go to the heading and mark it.
+  if (anchor && !isEditing) requestAnimationFrame(() => revealAnchor(anchor));
 }
 
 /* ---------------------------------------------------------------- header */
@@ -120,7 +135,7 @@ function moreSheet(page, rerender) {
 
 /* ---------------------------------------------------------------- reader */
 
-function reader(page, rerender) {
+function reader(page, rerender, graph) {
   const body = el('article', 'prose');
 
   const meta = el('dl', 'meta-grid');
@@ -145,15 +160,19 @@ function reader(page, rerender) {
   const firstProse = page.blocks?.find((b) => b.kind === 'paragraph')?.text?.replace(/\s+/g, ' ').trim();
   const summary = page.summary?.replace(/\s+/g, ' ').trim();
   const echoesBody = summary && firstProse && (firstProse === summary || firstProse.startsWith(summary.replace(/…$/, '')));
-  if (summary && !echoesBody) body.append(el('p', 'prose__lead', page.summary));
+  if (summary && !echoesBody) {
+    const lead = el('p', 'prose__lead');
+    lead.append(renderText(page.summary, graph));
+    body.append(lead);
+  }
 
   if (!page.blocks?.length) {
-    body.append(el('p', 'faint', 'Nothing written here yet. Tap Edit to begin.'));
+    body.append(el('p', 'faint', 'Nothing written here yet. Tap Edit to begin — typing [[ links to another page.'));
     return body;
   }
 
   for (const block of page.blocks) {
-    const node = renderBlock(block);
+    const node = renderBlock(block, graph);
     const effective = block.status || page.status;
     node.classList.add('block', `block--${effective}`);
     if (block.status) node.dataset.status = block.status;
@@ -178,8 +197,13 @@ function reader(page, rerender) {
   return body;
 }
 
-function renderBlock(block) {
+function renderBlock(block, graph) {
   const text = block.text ?? '';
+  // Blocks that are prose get their [[links]]; code keeps its literal text.
+  const linked = (node, value = text) => {
+    node.append(graph ? renderText(value, graph) : document.createTextNode(value));
+    return node;
+  };
   switch (block.kind) {
     case 'heading': {
       const level = Math.min(Math.max(block.level || 2, 2), 6);
@@ -187,33 +211,29 @@ function renderBlock(block) {
       if (block.anchor) node.id = block.anchor;
       return node;
     }
-    case 'quote': return el('blockquote', null, text);
+    case 'quote': return linked(el('blockquote'));
     case 'code': return el('pre', null, text.replace(/^```\w*\n?|```$/g, ''));
     case 'list': {
       const ordered = /^\s*\d+[.)]/.test(text);
       const list = el(ordered ? 'ol' : 'ul', 'prose__list');
       for (const line of text.split('\n')) {
         const item = line.replace(/^\s*(?:[-*+]|\d+[.)])\s*/, '').trim();
-        if (item) list.append(el('li', null, item));
+        if (item) list.append(linked(el('li'), item));
       }
       return list;
     }
-    case 'table': return renderTable(text);
+    case 'table': return renderTable(text, graph);
     case 'speech': {
       const line = el('p', 'prose__speech');
       line.append(el('span', 'prose__speaker', `${block.speaker || ''} `), document.createTextNode(text));
       return line;
     }
     case 'direction': return el('p', 'prose__direction', text);
-    default: {
-      const p = el('p');
-      p.textContent = text;
-      return p;
-    }
+    default: return linked(el('p'));
   }
 }
 
-function renderTable(text) {
+function renderTable(text, graph) {
   const wrap = el('div', 'table-scroll');
   const table = el('table', 'prose__table');
   const rows = text.split('\n').map((line) => line.trim()).filter((line) => line.startsWith('|'));
@@ -221,7 +241,11 @@ function renderTable(text) {
     const cells = line.replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
     if (cells.every((c) => /^:?-{2,}:?$/.test(c))) return; // the separator row
     const tr = el('tr');
-    for (const cell of cells) tr.append(el(index === 0 ? 'th' : 'td', null, cell));
+    for (const cell of cells) {
+      const td = el(index === 0 ? 'th' : 'td');
+      td.append(graph ? renderText(cell, graph) : document.createTextNode(cell));
+      tr.append(td);
+    }
     table.append(tr);
   });
   wrap.append(table);
@@ -243,8 +267,10 @@ function editor(page, save, rerender) {
   form.append(field('Aliases, comma separated', (page.aliases || []).join(', '),
     (value) => save({ aliases: value.split(',').map((s) => s.trim()).filter(Boolean) })));
 
-  form.append(field('One-line summary', page.summary, (value) => save({ summary: value }),
-    { multiline: true, placeholder: 'What this page is, in a sentence.' }));
+  const summaryField = field('One-line summary', page.summary, (value) => save({ summary: value }),
+    { multiline: true, placeholder: 'What this page is, in a sentence. [[ links ]] work here too.' });
+  attachLinkAutocomplete(summaryField.input, { excludeId: page.id, onCommit: (value) => save({ summary: value }) });
+  form.append(summaryField);
 
   if (page.type === PAGE_TYPE.CHARACTER) {
     form.append(select('Cast tier', CAST_TIER_ORDER.map((t) => [t, titleCase(t)]), page.castTier || 'record',
@@ -333,6 +359,10 @@ function editor(page, save, rerender) {
       if (block.kind === 'heading') block.anchor = slugify(area.value);
       autogrow(area);
       saveBlocks();
+    });
+    attachLinkAutocomplete(area, {
+      excludeId: page.id,
+      onCommit: (value) => { block.text = value; saveBlocks(); },
     });
     queueMicrotask(() => autogrow(area));
     wrap.append(area);
