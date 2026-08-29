@@ -1,0 +1,77 @@
+/* The Compendium — palette, type and spacing.
+ *
+ * Colour comes from the world, not from a UI kit: deep ink, aged vellum,
+ * verdigris, gold, oxblood. Dark and low-glare, because the author reads
+ * long prose on a phone at night.
+ *
+ * Fonts are declared as stacks over faces already on the device. The app
+ * has no network dependency, so it cannot fetch a webfont; drop .woff2
+ * files into /fonts and add @font-face here if you want the faces fixed.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* ---- ground */
+  --ink-900: #0b0d0f;   /* the page beneath everything */
+  --ink-800: #12161a;   /* sheet */
+  --ink-700: #1a2026;   /* raised sheet */
+  --ink-600: #232b33;   /* hairlines, wells */
+  --ink-500: #333d47;
+
+  /* ---- ink on that ground */
+  --vellum:     #e8e0cf;  /* body text */
+  --vellum-dim: #b8b0a1;  /* secondary */
+  --vellum-faint: #7d786e; /* metadata */
+
+  /* ---- the world's colours */
+  --gold:      #c9a227;
+  --gold-soft: #e0c05a;
+  --verdigris: #4d8b83;
+  --verdigris-soft: #6fb3a8;
+  --oxblood:   #8c2f31;
+  --oxblood-soft: #c25153;
+  --grey-source: #6d7278;
+
+  /* ---- canon status (single source of truth) */
+  --status-canon:    var(--gold);
+  --status-proposed: var(--verdigris-soft);
+  --status-open:     var(--oxblood-soft);
+  --status-source:   var(--grey-source);
+
+  /* ---- type */
+  --font-display: 'Optima', 'Palatino Linotype', 'Palatino', 'URW Palladio L',
+                  'Iowan Old Style', 'Hoefler Text', Georgia, serif;
+  --font-body: 'Iowan Old Style', 'Charter', 'Bitstream Charter', 'Sitka Text',
+               'Cambria', Georgia, 'Times New Roman', serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Menlo', 'Consolas', 'DejaVu Sans Mono', monospace;
+
+  --size-body: 1.0625rem;   /* comfortable long-form reading on a phone */
+  --leading-body: 1.62;
+  --measure: 34rem;         /* line length cap for prose */
+
+  /* ---- space */
+  --gap-1: 0.25rem;
+  --gap-2: 0.5rem;
+  --gap-3: 0.75rem;
+  --gap-4: 1rem;
+  --gap-5: 1.5rem;
+  --gap-6: 2.5rem;
+  --page-margin: clamp(1.1rem, 5vw, 3rem);
+
+  --radius: 3px;            /* nearly square: paper, not cards */
+  --tap: 44px;              /* minimum thumb target */
+  --rule: 1px solid var(--ink-600);
+
+  --shadow-sheet: 0 1px 0 rgba(255, 255, 255, 0.03), 0 12px 30px rgba(0, 0, 0, 0.45);
+  --motion: 180ms cubic-bezier(0.2, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --motion: 1ms; }
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
+}
