@@ -163,22 +163,34 @@ textarea.field { resize: vertical; overflow: hidden; }
   text-transform: uppercase; color: var(--gold); margin-bottom: var(--gap-2);
 }
 
-.tabbar {
+/* Tab bar — scrolls rather than clipping on narrow screens. Straight from
+   LAYER 6; the only additions are the fixed footing and the safe-area
+   padding this app needs on a phone. */
+.tabs {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 15;
-  display: flex; justify-content: space-around; align-items: stretch;
-  background: rgb(from var(--niche) r g b / 0.96);
-  backdrop-filter: blur(8px);
-  border-top: var(--hairline);
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  display: flex; gap: var(--s5);
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  padding: var(--s3) var(--gutter);
+  padding-bottom: calc(var(--s3) + env(safe-area-inset-bottom, 0px));
+  border-top: var(--rule) solid var(--edge);
+  background: rgb(from var(--field) r g b / 0.94);
+  backdrop-filter: blur(9px);
 }
-.tabbar__btn {
-  flex: 1; min-height: 52px; padding: 0 var(--gap-1);
-  display: inline-flex; align-items: center; justify-content: center;
-  background: none; border: 0; cursor: pointer; text-decoration: none;
-  color: var(--vellum-dim);
-  font: 500 0.7rem/1 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase;
+.tabs::-webkit-scrollbar { display: none; }
+.tabs button {
+  flex-shrink: 0; background: none; border: 0; cursor: pointer; padding: var(--s2) 0;
+  position: relative;
+  font-family: var(--ui); font-size: var(--t-xs); font-weight: 300;
+  letter-spacing: .22em; text-transform: uppercase; color: var(--stone-dark);
+  transition: color .35s var(--ease);
 }
-.tabbar__btn:hover { color: var(--vellum); background: var(--ink-700); }
+.tabs button:hover { color: var(--stone-dim); }
+.tabs button[aria-current="page"] { color: var(--stone-lit); }
+.tabs button[aria-current="page"]::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -2px;
+  height: var(--rule); background: var(--accent-grad);
+}
+.tabs button:focus-visible { outline: 1px solid var(--accent); outline-offset: 4px; }
 
 .banner {
   border-left: 3px solid var(--gold);

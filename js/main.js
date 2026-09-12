@@ -65,6 +65,17 @@ function showCover() {
 
 addEventListener('cover-changed', paintCover);
 
+/** The tab the current route belongs to, marked for the underline. */
+function markCurrentTab() {
+  const here = router.path();
+  for (const tab of $('tabs').querySelectorAll('button[data-to]')) {
+    const to = tab.dataset.to;
+    const current = to === '/' ? here === '/' : here.startsWith(to);
+    if (current) tab.setAttribute('aria-current', 'page');
+    else tab.removeAttribute('aria-current');
+  }
+}
+
 /* ----------------------------------------------------------------- routes */
 
 /* Views clear the container and then await their data, so two renders that
@@ -82,6 +93,7 @@ const withChrome = (fn) => (params) => {
     if (bookOpen) { $('cover').hidden = true; $('app').hidden = false; }
     window.scrollTo({ top: 0 });
     try {
+      markCurrentTab();
       await fn(view(), params);
     } catch (err) {
       console.error(err);
@@ -118,7 +130,11 @@ async function boot() {
   $('open-book').addEventListener('click', openBook);
   $('to-cover').addEventListener('click', () => { store.flush(); showCover(); });
   $('to-settings').addEventListener('click', () => router.go('/settings'));
-  $('to-contents').addEventListener('click', () => router.go('/'));
+  $('tabs').addEventListener('click', (event) => {
+    const to = event.target.closest('button')?.dataset.to;
+    if (to) router.go(to);
+  });
+  addEventListener('hashchange', markCurrentTab);
 
   // A deep link — a bookmarked page — opens the book at that page. The
   // chrome is revealed directly: router.start() does the one resolve.
@@ -128,6 +144,7 @@ async function boot() {
     $('app').hidden = false;
   }
   router.start();
+  markCurrentTab();
 }
 
 addEventListener('pagehide', () => { store.flush(); });
