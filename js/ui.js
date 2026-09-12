@@ -29,7 +29,7 @@ export function button(label, { className = 'btn', onClick, title, disabled } = 
 export function field(label, value, onInput, { multiline = false, placeholder = '' } = {}) {
   const wrap = el('label', 'labelled');
   wrap.append(el('span', 'labelled__name mono', label));
-  const input = el(multiline ? 'textarea' : 'input', 'field');
+  const input = el(multiline ? 'textarea' : 'input', 'entry');
   if (!multiline) input.type = 'text';
   input.value = value ?? '';
   input.placeholder = placeholder;
@@ -52,7 +52,7 @@ export function autogrow(textarea) {
 export function select(label, options, value, onChange) {
   const wrap = el('label', 'labelled');
   wrap.append(el('span', 'labelled__name mono', label));
-  const node = el('select', 'field');
+  const node = el('select', 'entry entry--select');
   for (const [optValue, optLabel] of options) {
     const option = el('option', null, optLabel);
     option.value = optValue;

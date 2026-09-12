@@ -32,7 +32,7 @@ export async function render(container, type) {
   header.append(el('p', 'dim', section.blurb));
   container.append(header);
 
-  const search = el('input', 'field field--search');
+  const search = el('input', 'entry entry--search');
   search.type = 'search';
   search.placeholder = `Search ${section.label.toLowerCase()}…`;
   search.value = filters.query;

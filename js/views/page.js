@@ -260,7 +260,7 @@ function editor(page, save, rerender) {
   const saveBlocks = () => save({ blocks });
 
   const titleField = field('Title', page.title, (value) => save({ title: value }), { placeholder: 'Untitled' });
-  titleField.input.classList.add('field--title');
+  titleField.input.classList.add('entry--title');
   form.append(titleField);
   if (!page.title) queueMicrotask(() => titleField.input.focus({ preventScroll: true }));
 
@@ -350,7 +350,7 @@ function editor(page, save, rerender) {
     bar.append(move);
     wrap.append(bar);
 
-    const area = el('textarea', 'field field--block');
+    const area = el('textarea', 'entry entry--block');
     area.value = block.text;
     area.rows = 2;
     area.setAttribute('aria-label', `${block.kind} block ${index + 1}`);
