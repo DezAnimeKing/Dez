@@ -1,0 +1,86 @@
+/* Design tokens. Dark is the default surface; light is a full re-map. */
+:root {
+  --accent-h: 76;
+  --accent-s: 82%;
+  --accent-l: 63%;
+
+  --accent: hsl(var(--accent-h) var(--accent-s) var(--accent-l));
+  --accent-soft: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.16);
+  --accent-line: hsl(var(--accent-h) var(--accent-s) var(--accent-l) / 0.35);
+  --accent-ink: hsl(var(--accent-h) 45% 10%);
+
+  --radius-xs: 6px;
+  --radius-sm: 9px;
+  --radius-md: 13px;
+  --radius-lg: 18px;
+  --radius-xl: 26px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 22px;
+  --space-6: 30px;
+
+  --rail-w: 58px;
+  --side-w: 244px;
+  --topbar-h: 62px;
+
+  --font: "Inter", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 8px 24px -8px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 24px 60px -20px rgb(0 0 0 / 0.7);
+
+  /* status hues, shared by both themes */
+  --hue-high: 8;
+  --hue-medium: 35;
+  --hue-low: 200;
+  --hue-done: 145;
+}
+
+:root, [data-theme="dark"] {
+  --bg: #0a0b0d;
+  --bg-rail: #0e1013;
+  --panel: #111316;
+  --panel-2: #16191d;
+  --panel-3: #1c2025;
+  --card: #15181c;
+  --card-hover: #1a1e23;
+  --line: #22262c;
+  --line-soft: #1a1e22;
+  --ink: #e9edf2;
+  --ink-2: #9aa3ae;
+  --ink-3: #6b7480;
+  --ink-inv: #0a0b0d;
+  --overlay: rgb(4 5 7 / 0.72);
+  --track: #22262c;
+  --chip: #1e2228;
+  --scrim: rgb(255 255 255 / 0.04);
+  --shadow-color: 0 0% 0%;
+}
+
+[data-theme="light"] {
+  --bg: #f4f5f7;
+  --bg-rail: #ffffff;
+  --panel: #ffffff;
+  --panel-2: #f7f8fa;
+  --panel-3: #eef0f4;
+  --card: #ffffff;
+  --card-hover: #f7f8fa;
+  --line: #e2e5ea;
+  --line-soft: #ebedf1;
+  --ink: #14171c;
+  --ink-2: #5b636e;
+  --ink-3: #8b929c;
+  --ink-inv: #ffffff;
+  --overlay: rgb(20 23 28 / 0.42);
+  --track: #e4e7ec;
+  --chip: #eef0f4;
+  --scrim: rgb(16 18 22 / 0.03);
+  --shadow-sm: 0 1px 2px rgb(16 18 22 / 0.08);
+  --shadow-md: 0 10px 26px -12px rgb(16 18 22 / 0.22);
+  --shadow-lg: 0 26px 60px -22px rgb(16 18 22 / 0.28);
+}
