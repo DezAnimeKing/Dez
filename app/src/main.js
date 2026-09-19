@@ -11,6 +11,7 @@ import { closeMenu } from "./ui/menu.js";
 import { drawerOpen, closeDrawer, drawerKey, openTaskDrawer, openRecordDrawer } from "./ui/drawer.js";
 import { toast } from "./ui/toast.js";
 import { toggle as toggleTimer } from "./ui/timer.js";
+import { start as startSync } from "./store/sync.js";
 
 import { todayView } from "./views/today.js";
 import { tasksView } from "./views/tasks.js";
@@ -288,6 +289,16 @@ window.addEventListener("resize", () => {
 applyTheme(store.state);
 store.mutate((state) => { state.meta.lastOpened = new Date().toISOString(); }, { silent: true });
 startRouter(store.state.settings.startPage || "#/today");
+startSync();
+
+// Offline shell. Only over http(s) — a service worker cannot register on file://.
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).catch((error) => {
+      console.warn("Dezk: offline support is unavailable here.", error);
+    });
+  });
+}
 
 // Surface a crash rather than leaving a blank screen behind.
 window.addEventListener("error", (event) => {

@@ -11,6 +11,7 @@ import {
 import { openPalette } from "./palette.js";
 import { openNewProject, openNewPage } from "./dialogs.js";
 import { openQuickAdd } from "./quickadd.js";
+import { syncPill } from "./syncui.js";
 
 const RAIL = [
   { href: "#/today", icon: "home", label: "Today" },
@@ -215,6 +216,7 @@ export function renderSidebar(state) {
     ),
     h(
       "div", { class: "sidebar__foot" },
+      syncPill(),
       h("button", { class: "btn btn--primary btn--block", onClick: () => openQuickAdd() }, icon("plus", 16), "New task")
     )
   );

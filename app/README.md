@@ -5,8 +5,29 @@ and project boards, a calendar, habits, notes, a focus timer, and **pages** —
 small databases you shape yourself, which is how the Journal and Reading list
 are built.
 
-No account, no server, no build step, no dependencies. Open `index.html` and it
-works; everything is stored in your browser and exports to one JSON file.
+No build step and no dependencies. Open `index.html` and it works, with
+everything stored in your browser — and if you want the same deck on your phone
+and your laptop, point it at your own sync server (a free Cloudflare Worker,
+set up once) and they stay in step.
+
+## Syncing across your devices
+
+Optional, and off until you turn it on. Deploy the Worker in
+[`server/`](../server/README.md) — five commands — then open its address on
+each device and sign in with the same passphrase under **Settings → Sync**.
+
+- **Offline first.** Every device keeps its own full copy, so the app works on a
+  train with no signal. Changes queue up and go out when you reconnect.
+- **Per-item merging.** Each task, project, page, entry, note and habit syncs on
+  its own. Editing different things on two devices never conflicts; editing the
+  same thing keeps the later edit. Habit ticks merge day by day, so a tick on
+  your phone and one on your laptop both survive.
+- **Deletions travel**, as tombstones, rather than being undone by the device
+  that had not heard about them.
+- **Installable.** Add it to your home screen and it opens like an app.
+
+Without a server nothing leaves the browser, and export/import still moves your
+data by hand.
 
 ## Running it
 
@@ -18,8 +39,9 @@ python3 -m http.server 8899
 
 Opening `index.html` straight off disk works too, though a couple of browsers
 block local storage on `file://` — if yours does, Dezk says so in Settings and
-keeps running in memory. For a permanent copy, push this folder to GitHub Pages
-or any static host.
+keeps running in memory. For a permanent copy, deploy the Worker (which serves
+this folder and syncs it), or push the folder to GitHub Pages or any static
+host if you do not want syncing.
 
 First run loads sample data so the screens are not empty. Settings → *Start
 fresh* clears it.
@@ -78,10 +100,11 @@ deserve a decision rather than another week.
 
 ## Your data
 
-Everything lives in this browser's local storage under `dezk.state.v1` and is
-never sent anywhere. Settings → *Backup* downloads the lot as JSON; *Restore*
-reads it back, on this machine or another one. Destructive actions are undoable
-from the toast that follows them, or with `Ctrl`/`⌘` + `Z`.
+Everything lives in this browser's local storage under `dezk.state.v1`. With
+syncing off it is never sent anywhere; with syncing on it is mirrored to your
+own server and nowhere else. Settings → *Backup* downloads the lot as JSON
+(without the sync token); *Restore* reads it back. Destructive actions are
+undoable from the toast that follows them, or with `Ctrl`/`⌘` + `Z`.
 
 ## How it is put together
 
@@ -93,20 +116,31 @@ src/
   router.js           hash routes, "#/pages/:id?view=:id"
   lib/                dom (hyperscript), date, icons, id, quick-add parser
   store/
-    state.js          the store: persistence, migrations, undo stack
+    state.js          the store: persistence, migrations, undo stack, change tracking
+    entities.js       the flat, syncable view of the state, and the merge rules
+    sync.js           push, pull, retry, and when to do it
     seed.js           sample content, dated relative to today
     selectors.js      every derived query in one place
     actions.js        every mutation in one place
     templates.js      page templates and field/view types
-  ui/                 shell, palette, drawer, modal, menu, toast, timer, controls
+  ui/                 shell, palette, drawer, modal, menu, toast, timer, sync, controls
   views/              one module per screen, each returning { topbar, body }
-tests/                three Playwright suites — see tests/README.md
+sw.js                 offline shell
+manifest.webmanifest  makes it installable
+tests/                four Playwright suites — see tests/README.md
+../server/            the Cloudflare Worker and D1 schema
 ```
 
 The render loop is deliberately blunt: any change to the store rebuilds the
 current view, and `main.js` puts the caret and scroll position back where they
 were. There is no virtual DOM to reason about, and at this data size there is no
 need for one.
+
+Change tracking is equally blunt. After every mutation the store compares the
+state against a fingerprint of what it last wrote, stamps whatever differs with
+the time it changed, and notes anything that vanished. Nothing in `actions.js`
+has to remember to mark itself dirty, and offline edits survive a reload because
+the queue is part of the saved state.
 
 Adding a screen means writing `src/views/thing.js` that returns a topbar
 description and a body node, then adding one line to the `ROUTES` table in

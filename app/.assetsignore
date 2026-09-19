@@ -1,0 +1,5 @@
+# Files under app/ that should not be published as part of the site.
+node_modules
+tests
+.shots
+.assetsignore

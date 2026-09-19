@@ -1,0 +1,27 @@
+# Dezk — the app and its sync API, deployed as one Worker.
+#
+#   npx wrangler d1 create dezk          # paste database_id below
+#   npx wrangler d1 execute dezk --remote --file=server/schema.sql
+#   npx wrangler secret put DEZK_PASSPHRASE
+#   npx wrangler deploy
+#
+# Run it from the repository root: `npx wrangler deploy -c server/wrangler.toml`.
+
+name = "dezk"
+main = "worker.js"
+compatibility_date = "2025-09-01"
+
+# The static app is served from the same origin as the API, so there is one
+# address to open on every device and no CORS to think about.
+[assets]
+directory = "../app"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "dezk"
+database_id = "PASTE_YOUR_DATABASE_ID_HERE"
+
+[observability]
+enabled = true

@@ -389,7 +389,7 @@ export function createHabit(partial = {}) {
   store.mutate((state) => {
     state.habits.push({
       id, name: "New habit", color: "#c7f051", icon: "target", target: 7,
-      log: {}, createdAt: now(), archived: false, ...partial,
+      log: {}, logAt: {}, createdAt: now(), archived: false, ...partial,
     });
   }, { undoable: true, label: "Habit added" });
   return id;
@@ -408,6 +408,9 @@ export function toggleHabitDay(id, key = todayKey()) {
     if (!habit) return;
     if (habit.log[key]) delete habit.log[key];
     else habit.log[key] = true;
+    // Remembered per day so a tick here and a tick there both survive a sync.
+    habit.logAt = habit.logAt || {};
+    habit.logAt[key] = Date.now();
   });
 }
 

@@ -1,0 +1,4 @@
+node_modules/
+app/.shots/
+server/wrangler.dev.toml
+.wrangler/

@@ -7,6 +7,7 @@ import { confirmDialog } from "../ui/modal.js";
 import { openShortcuts, openCategoryManager } from "../ui/dialogs.js";
 import { ACCENTS } from "../ui/controls.js";
 import { panel } from "./parts.js";
+import { syncSettingsRows } from "../ui/syncui.js";
 import { DOW_LONG } from "../lib/date.js";
 
 export function exportData() {
@@ -85,6 +86,7 @@ export function settingsView({ state }) {
     "div", { class: "view__inner", style: { maxWidth: "760px" } },
     h(
       "div", { class: "u-col", style: { gap: "16px" } },
+      panel("Sync", syncSettingsRows(), { icon: "globe" }),
       panel(
         "Appearance",
         h(
@@ -159,7 +161,9 @@ export function settingsView({ state }) {
             `Everything lives in this browser — ${counts.tasks} tasks, ${counts.projects} projects, ${counts.pages} pages holding ${counts.entries} entries, ${counts.notes} notes and ${counts.habits} habits, about ${(approximateSize / 1024).toFixed(0)} KB in all. `,
             storageKind === "memory"
               ? "This browser is blocking local storage, so changes will be lost when you close the tab — export a backup before you go."
-              : "Nothing is sent anywhere. Export a backup to move it to another machine."
+              : store.state.sync.url
+                ? "It is also mirrored to your own sync server, so your other devices see the same thing. A backup is still worth keeping."
+                : "Nothing is sent anywhere. Turn on syncing above to share it with your other devices, or export a backup to move it by hand."
           ),
           row("Backup", "Download everything as a JSON file.",
             h("button", { class: "btn btn--sm", onClick: exportData }, icon("download", 14), "Export")),
