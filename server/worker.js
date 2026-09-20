@@ -69,8 +69,12 @@ async function tokenValid(env, token) {
 const bearer = (request) => (request.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
 
 function configError(env) {
-  if (!env.DB) return "This worker has no D1 database bound as DB.";
-  if (!env.DEZK_PASSPHRASE) return "No passphrase is set. Run: npx wrangler secret put DEZK_PASSPHRASE";
+  if (!env.DB) {
+    return "This Worker has no D1 database bound as DB. Add the binding in Settings \u2192 Bindings, or check database_id in wrangler.toml.";
+  }
+  if (!env.DEZK_PASSPHRASE) {
+    return "No passphrase is set. Add a Secret named DEZK_PASSPHRASE under the Worker's Settings \u2192 Variables and Secrets (not the Build section), or run: npx wrangler secret put DEZK_PASSPHRASE";
+  }
   return null;
 }
 
