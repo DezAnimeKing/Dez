@@ -23,10 +23,7 @@ not_found_handling = "single-page-application"
 
 [[d1_databases]]
 binding = "DB"
-database_# Must match the Worker's name in Cloudflare. A Git-connected build overrides
-# a mismatch with a warning, but `wrangler deploy` run by hand would create a
-# second Worker under whatever name is written here.
-name = "dez"
+database_name = "dezk"
 database_id = "d6a43482-f15e-49a4-8f3a-5f71bb0a7520"
 
 [observability]
