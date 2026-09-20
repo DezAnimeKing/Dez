@@ -21,7 +21,7 @@ not_found_handling = "single-page-application"
 [[d1_databases]]
 binding = "DB"
 database_name = "dezk"
-database_id = "PASTE_YOUR_DATABASE_ID_HERE"
+database_id = "d6a43482-f15e-49a4-8f3a-5f71bb0a7520"
 
 [observability]
 enabled = true
