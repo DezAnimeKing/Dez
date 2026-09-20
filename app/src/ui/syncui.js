@@ -53,7 +53,7 @@ export function openSyncDialog() {
 
   const urlInput = h("input", {
     class: "input", value: state.sync.url || "", placeholder: "https://dezk.your-name.workers.dev",
-    autocomplete: "url", spellcheck: "false",
+    autocomplete: "url", spellcheck: "false", inputmode: "url",
   });
   const passInput = h("input", {
     class: "input", type: "password", placeholder: connected ? "Only needed to sign in again" : "Your passphrase",
@@ -113,7 +113,10 @@ export function openSyncDialog() {
         connected
           ? "This device is talking to your own server. Open the same address on your phone, enter the same passphrase, and they stay in step."
           : "Dezk keeps your data in this browser. Point it at your own sync server — a free Cloudflare Worker, set up once — and every device you sign in on stays in step. See server/README.md for the five commands."),
-      h("label", { class: "field" }, h("span", { class: "field__label" }, "Server address"), urlInput),
+      h("label", { class: "field" },
+        h("span", { class: "field__label" }, "Server address"),
+        urlInput,
+        h("span", { class: "field__hint" }, "Pasting the app's own address is fine — anything after the domain is ignored.")),
       h("label", { class: "field" }, h("span", { class: "field__label" }, "Passphrase"), passInput),
       h("label", { class: "field" }, h("span", { class: "field__label" }, "Name this device"), nameInput,
         h("span", { class: "field__hint" }, "Only used to tell your devices apart.")),

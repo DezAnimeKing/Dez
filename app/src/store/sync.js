@@ -66,9 +66,30 @@ async function request(path, { method = "POST", body = null, token = store.state
 /**
  * @returns {Promise<{serverHasData: boolean}>}
  */
+/**
+ * Accepts whatever someone pastes out of an address bar — the app's own hash
+ * route, a query string, a trailing slash, or no scheme at all — and reduces
+ * it to the base the API lives under.
+ */
+export function normalizeServerUrl(input) {
+  const raw = String(input || "").trim();
+  if (!raw) throw new Error("Enter the address of your sync server");
+
+  let parsed;
+  try {
+    parsed = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
+  } catch {
+    throw new Error("That does not look like a web address");
+  }
+  if (parsed.protocol !== "https:" && parsed.hostname !== "localhost" && parsed.hostname !== "127.0.0.1") {
+    throw new Error("The address needs to start with https://");
+  }
+  // The hash is the app's own routing, never part of the server address.
+  return `${parsed.origin}${parsed.pathname}`.replace(/\/index\.html$/i, "").replace(/\/+$/, "");
+}
+
 export async function connect(url, passphrase, { deviceName = "" } = {}) {
-  const clean = url.trim().replace(/\/+$/, "");
-  if (!/^https?:\/\//.test(clean)) throw new Error("The address needs to start with https://");
+  const clean = normalizeServerUrl(url);
 
   const response = await fetch(`${clean}/api/login`, {
     method: "POST",
@@ -76,7 +97,11 @@ export async function connect(url, passphrase, { deviceName = "" } = {}) {
     body: JSON.stringify({ passphrase }),
   });
   const payload = await response.json().catch(() => null);
-  if (!response.ok) throw new Error(payload?.error || (response.status === 401 ? "That passphrase was not accepted" : `Server said ${response.status}`));
+  if (!response.ok) {
+    if (response.status === 401) throw new Error(payload?.error || "That passphrase was not accepted");
+    if (response.status === 404) throw new Error(`No sync server answered at ${clean} — check the address`);
+    throw new Error(payload?.error || `Server said ${response.status}`);
+  }
 
   store.setSync({
     url: clean,
