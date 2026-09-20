@@ -40,6 +40,36 @@ The first device to connect uploads its deck. The second one is offered the
 server's copy instead of its own sample data, so you do not end up with two
 sets of demo projects.
 
+### Deploying from the dashboard instead
+
+If the CLI is awkward on your machine — no Node, a locked-down PowerShell, or
+antivirus objecting to `npx` downloading and running things — Cloudflare can
+build and deploy the Worker itself, straight from GitHub. Nothing runs locally.
+
+1. **Storage & Databases → D1 → Create database**, named `dezk`. Copy the
+   Database ID it shows.
+2. Open that database's **Console** tab and run the contents of
+   [`schema.sql`](schema.sql) to create the tables.
+3. Put the Database ID into [`wrangler.toml`](wrangler.toml), replacing
+   `PASTE_YOUR_DATABASE_ID_HERE`. GitHub's own web editor is fine for this.
+4. **Workers & Pages → Create → Import a repository**, authorise the Cloudflare
+   Workers and Pages GitHub app for this repository, then set:
+   - **Deploy command:** `npx wrangler deploy -c server/wrangler.toml`
+   - **Build command:** empty
+   - **Root directory:** `/`
+   - **Production branch:** the branch that actually holds `server/` and `app/`
+5. **Settings → Variables and Secrets** → add a **Secret** named
+   `DEZK_PASSPHRASE`. Saving it redeploys the Worker on its own.
+
+Every later push to that branch redeploys, so updating the app becomes a commit
+rather than a command.
+
+One thing that catches people out: the **production branch** setting decides
+what gets cloned, and changing it does not retry an already-failed build. If
+the build log says `Could not read file: server/wrangler.toml`, it cloned a
+branch without this directory on it — fix the branch setting, then push a
+commit to trigger a fresh build rather than retrying the old one.
+
 ### Updating it later
 
 ```sh
