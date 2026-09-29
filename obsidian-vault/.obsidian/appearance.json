@@ -1,0 +1,13 @@
+{
+  "theme": "obsidian",
+  "cssTheme": "",
+  "baseFontSize": 16,
+  "accentColor": "#ff1f3d",
+  "enabledCssSnippets": [
+    "xo-nights"
+  ],
+  "interfaceFontFamily": "Zen Kaku Gothic New",
+  "monospaceFontFamily": "Share Tech Mono",
+  "showRibbon": true,
+  "translucency": false
+}

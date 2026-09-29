@@ -1,0 +1,13 @@
+{
+  "alwaysUpdateLinks": true,
+  "newFileLocation": "folder",
+  "newFileFolderPath": "00 Inbox",
+  "attachmentFolderPath": "99 System/Assets",
+  "readableLineLength": true,
+  "showLineNumber": false,
+  "showInlineTitle": true,
+  "promptDelete": true,
+  "defaultViewMode": "preview",
+  "livePreview": true,
+  "propertiesInDocument": "visible"
+}

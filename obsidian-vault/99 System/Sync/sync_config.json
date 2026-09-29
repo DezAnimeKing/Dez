@@ -1,0 +1,11 @@
+{
+  "budget_workbook": "../spreadsheets/Ultimate_Budget_Planner.xlsx",
+  "tasks_workbook": "../spreadsheets/Task_Habit_Tracker.xlsx",
+  "daily_folder": "01 Daily",
+  "exclude_folders": ["99 System", ".obsidian", ".trash"],
+  "generated_notes": ["03 Money/Budget Snapshot.md", "02 Tasks/Excel Agenda.md"],
+  "default_account": "Credit Card 1",
+  "push_to_excel": true,
+  "pull_from_excel": true,
+  "backup": true
+}
