@@ -10,8 +10,8 @@ cssclasses:
 > A dark, neon personal OS: **After Hours** red for tasks & focus, **Dawn FM** blue/teal for money & planning, **Kissland** pink/violet (Tokyo city pop) for habits, journal & music, and a green CRT terminal for system notes.
 
 ## First launch
-1. Open this folder as a vault (Obsidian ▸ *Open folder as vault*).
-2. When asked, click **Trust author and enable plugins** (Dataview, Tasks, Calendar, Heatmap Calendar, Homepage are bundled).
+1. Open **this folder** (the one containing `START HERE.md` and the hidden `.obsidian` folder) with Obsidian ▸ *Open folder as vault*. Not its parent.
+2. When asked, click **Trust author and enable plugins** (or Settings ▸ Community plugins ▸ Turn on community plugins) (Dataview, Tasks, Calendar, Heatmap Calendar, Homepage are bundled).
 3. Settings ▸ Appearance: base theme **Dark**, CSS snippet **xo-nights** on (already enabled).
 4. Right sidebar: drag **Calendar** into the top panel and **Graph (local)** / **Tags** below — the layout from your reference.
 5. Home opens automatically. Sample data is included (September 2026) — delete `01 Daily/*` when you're ready.

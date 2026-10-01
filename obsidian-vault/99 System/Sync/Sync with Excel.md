@@ -34,10 +34,10 @@ cssclasses:
 - Excel → Obsidian reads what Excel last saved, so open & save a workbook once after changing it.
 
 ## Where the workbooks live
-Edit `sync_config.json` (paths are relative to the vault folder):
+Edit `sync_config.json` (paths are relative to the vault folder; the workbooks ship in the vault's `Excel/` folder):
 ```json
-"budget_workbook": "../spreadsheets/Ultimate_Budget_Planner.xlsx",
-"tasks_workbook":  "../spreadsheets/Task_Habit_Tracker.xlsx"
+"budget_workbook": "Excel/Ultimate_Budget_Planner.xlsx",
+"tasks_workbook":  "Excel/Task_Habit_Tracker.xlsx"
 ```
 Using OneDrive / iCloud? Point these at the synced copies — the vault and the workbooks can live in different cloud folders.
 

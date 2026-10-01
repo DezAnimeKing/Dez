@@ -545,8 +545,16 @@ def push_gratitude(book, gratitude):
 # =============================================================== main
 def main():
     cfg = json.loads((HERE / "sync_config.json").read_text(encoding="utf-8"))
-    budget_path = (VAULT / cfg["budget_workbook"]).resolve()
-    tasks_path = (VAULT / cfg["tasks_workbook"]).resolve()
+    def find(rel):
+        """Configured path first, then the vault's Excel/ folder, then a sibling spreadsheets/ folder."""
+        name = Path(rel).name
+        for cand in (VAULT / rel, VAULT / "Excel" / name, VAULT.parent / "spreadsheets" / name):
+            if cand.exists():
+                return cand.resolve()
+        return (VAULT / rel).resolve()
+
+    budget_path = find(cfg["budget_workbook"])
+    tasks_path = find(cfg["tasks_workbook"])
     backups = HERE / "backups" if cfg.get("backup", True) else None
     dry = "--dry-run" in sys.argv
     print("XO NIGHTS · excel bridge ·", dt.datetime.now().strftime("%Y-%m-%d %H:%M"))
