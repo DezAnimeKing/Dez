@@ -3,14 +3,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Oswald:wght@500;600&family=VT323&family=Share+Tech+Mono&display=swap");
 
 body.theme-dark {
-  --xo-black: #02040a;
-  --xo-bg: #040811;
-  --xo-panel: #08101f;
-  --xo-panel-2: #0c1730;
-  --xo-line: #16274a;
-  --xo-text: #e4efff;
-  --xo-muted: #7e95bb;
-  --xo-faint: #3d5078;
+  --xo-black: #030304;
+  --xo-bg: #060709;
+  --xo-panel: #0c0e12;
+  --xo-panel-2: #11141a;
+  --xo-line: #1e232d;
+  --xo-text: #eef2f8;
+  --xo-muted: #8d95a5;
+  --xo-faint: #4b5262;
 
   --ah-red: #ff5a1f;            /* the sunrise on the cover */
   --ah-crimson: #c2361c;
@@ -40,11 +40,10 @@ body.theme-dark {
   --h1-color: #6ec6ff; --h2-color: #43e0ff; --h3-color: #b9e1ff; --h4-color: #ff8a3d;
   --link-color: #6ec6ff; --link-color-hover: #43e0ff;
   --tag-color: #43e0ff; --tag-background: rgba(67, 224, 255, 0.08); --tag-border-color: rgba(67, 224, 255, 0.35);
-  --code-background: #030a0a; --code-normal: #46e0b0; --code-comment: #1b5e4a;
+  --code-background: #08090b; --code-normal: #46e0b0; --code-comment: #1b5e4a;
 }
 body.theme-dark .workspace-leaf-content[data-type="markdown"] .view-content {
-  background: radial-gradient(ellipse at 50% 0%, rgba(30, 90, 200, 0.22), transparent 60%),
-              radial-gradient(ellipse at 50% 100%, rgba(255, 90, 31, 0.06), transparent 50%), var(--xo-bg);
+  background: radial-gradient(ellipse at 50% -15%, rgba(30, 90, 200, 0.08), transparent 55%), var(--xo-bg);
 }
 .theme-dark .markdown-rendered h1, .theme-dark .HyperMD-header-1, .theme-dark .inline-title, .theme-dark .xo-title {
   font-family: var(--font-display); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;

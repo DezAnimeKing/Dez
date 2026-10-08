@@ -3,14 +3,14 @@
 @import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,600;1,6..96,500&family=Share+Tech+Mono&display=swap");
 
 body.theme-dark {
-  --xo-black: #050203;
-  --xo-bg: #0a0405;
-  --xo-panel: #130809;
-  --xo-panel-2: #1a0b0d;
-  --xo-line: #2e1216;
-  --xo-text: #f4e8e6;
-  --xo-muted: #a8898b;
-  --xo-faint: #5e4144;
+  --xo-black: #030303;
+  --xo-bg: #070606;
+  --xo-panel: #0e0c0c;
+  --xo-panel-2: #141111;
+  --xo-line: #241e1f;
+  --xo-text: #f2eeee;
+  --xo-muted: #9b9394;
+  --xo-faint: #574f50;
 
   /* remap the shared accent tokens into this palette */
   --ah-red: #ff1f2d;            /* neon "wake me up" red */
@@ -41,16 +41,16 @@ body.theme-dark {
   --h1-color: #ff1f2d; --h2-color: #f4e8e6; --h3-color: #e8344a; --h4-color: #ffad3b;
   --link-color: #ff5a5f; --link-color-hover: #ff1f2d;
   --tag-color: #ff8a80; --tag-background: rgba(255, 31, 45, 0.08); --tag-border-color: rgba(255, 31, 45, 0.35);
-  --code-background: #0d0303; --code-normal: #ff6b5a; --code-comment: #7a1a14;
+  --code-background: #0a0909; --code-normal: #ff6b5a; --code-comment: #7a1a14;
 }
 body.theme-dark .workspace-leaf-content[data-type="markdown"] .view-content {
-  background: radial-gradient(ellipse at 50% -10%, rgba(160, 0, 15, 0.22), transparent 60%), var(--xo-bg);
+  background: radial-gradient(ellipse at 50% -15%, rgba(160, 0, 15, 0.07), transparent 55%), var(--xo-bg);
 }
 .theme-dark .markdown-rendered h1, .theme-dark .HyperMD-header-1, .theme-dark .inline-title, .theme-dark .xo-title {
   font-family: var(--font-display); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
 }
 .theme-dark .markdown-rendered h2, .theme-dark .HyperMD-header-2 {
   font-family: var(--font-display); font-style: italic; letter-spacing: 0.02em; text-transform: none;
-  text-shadow: none; border-bottom-color: #2e1216;
+  text-shadow: none; border-bottom-color: #241e1f;
 }
 .status-bar::before { content: "◉ AFTER HOURS  ·  深夜三時" !important; color: #ff1f2d !important; text-shadow: 0 0 6px var(--ah-glow) !important; }
