@@ -8,7 +8,13 @@
 5. **Random thought?** Put it in [[Brain Dump]].
 6. Unfinished tasks from earlier days show up at the top of today's note as **Carried over**. Tick them there.
 
-That's the whole system. [[Home]] has your weekly numbers and the music player.
+That's the whole system. [[Home]] is the dashboard: today's tasks and habits (tick them right there), the latest timeline entries, money, your projects board and the music player.
+
+## Themes
+Switch at the top right of [[Home]]: **After Hours** (red noir), **Dawn FM** (blue airwaves) or **Neon** (the original). Or use Settings ▸ Appearance ▸ CSS snippets, keeping **xo-nights** on and only one of `theme-after-hours` / `theme-dawn-fm`.
+
+## Projects
+Each project is a note in `Projects/`. Add one from the box under the board. It starts in Backlog. Move it along with ← → and tick its tasks inside the note. The progress bars update on their own.
 
 ## Excel (on your PC, whenever you like)
 Close the workbooks, then double-click `System/Sync/sync.bat` (Windows) or `sync.command` (Mac). [[Sync with Excel|Details]].

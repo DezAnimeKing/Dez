@@ -1,0 +1,56 @@
+/* AFTER HOURS — blood-red noir, motel-sign blue, storefront teal, casino amber.
+   Works on top of xo-nights.css. Switch themes from the Home dashboard (or Settings ▸ Appearance ▸ CSS snippets). */
+@import url("https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,600;1,6..96,500&family=Share+Tech+Mono&display=swap");
+
+body.theme-dark {
+  --xo-black: #050203;
+  --xo-bg: #0a0405;
+  --xo-panel: #130809;
+  --xo-panel-2: #1a0b0d;
+  --xo-line: #2e1216;
+  --xo-text: #f4e8e6;
+  --xo-muted: #a8898b;
+  --xo-faint: #5e4144;
+
+  /* remap the shared accent tokens into this palette */
+  --ah-red: #ff1f2d;            /* neon "wake me up" red */
+  --ah-crimson: #a3000f;        /* dried blood */
+  --ah-glow: rgba(255, 31, 45, 0.55);
+  --kl-pink: #e8344a;           /* crimson */
+  --kl-violet: #8c1328;         /* wine */
+  --kl-sakura: #ffb4b0;         /* pale neon blush */
+  --kl-glow: rgba(232, 52, 74, 0.5);
+  --dfm-teal: #2fd6c9;          /* storefront teal */
+  --dfm-blue: #3b6bff;          /* motel blue */
+  --dfm-glow: rgba(47, 214, 201, 0.4);
+  --amber: #ffad3b;             /* casino marquee */
+  --crt: #ff4b3e;               /* car-stereo LCD, red */
+  --crt-dim: #7a1a14;
+  --crt-glow: rgba(255, 75, 62, 0.45);
+
+  --xo-accent: var(--ah-red);
+  --xo-accent-2: var(--kl-pink);
+  --xo-glow: var(--ah-glow);
+
+  /* timeline kinds */
+  --k-woke: #ffad3b; --k-walk: #2fd6c9; --k-gym: #e8344a; --k-meal: #ff6b5a; --k-done: #2ee6a6;
+  --k-sleep: #3b6bff; --k-water: #2fd6c9; --k-sauna: #ff1f2d; --k-cold: #3b6bff; --k-work: #ffad3b;
+  --k-read: #c2185b; --k-meds: #ff8fa0; --k-note: #a8898b;
+
+  --font-display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --h1-color: #ff1f2d; --h2-color: #f4e8e6; --h3-color: #e8344a; --h4-color: #ffad3b;
+  --link-color: #ff5a5f; --link-color-hover: #ff1f2d;
+  --tag-color: #ff8a80; --tag-background: rgba(255, 31, 45, 0.08); --tag-border-color: rgba(255, 31, 45, 0.35);
+  --code-background: #0d0303; --code-normal: #ff6b5a; --code-comment: #7a1a14;
+}
+body.theme-dark .workspace-leaf-content[data-type="markdown"] .view-content {
+  background: radial-gradient(ellipse at 50% -10%, rgba(160, 0, 15, 0.22), transparent 60%), var(--xo-bg);
+}
+.theme-dark .markdown-rendered h1, .theme-dark .HyperMD-header-1, .theme-dark .inline-title, .theme-dark .xo-title {
+  font-family: var(--font-display); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+}
+.theme-dark .markdown-rendered h2, .theme-dark .HyperMD-header-2 {
+  font-family: var(--font-display); font-style: italic; letter-spacing: 0.02em; text-transform: none;
+  text-shadow: none; border-bottom-color: #2e1216;
+}
+.status-bar::before { content: "◉ AFTER HOURS  ·  深夜三時" !important; color: #ff1f2d !important; text-shadow: 0 0 6px var(--ah-glow) !important; }

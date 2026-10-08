@@ -5,21 +5,22 @@
 //     - 3x Chin-Up · 19 reps          (indented lines become rows inside the card)
 //   - 10:09 meal Greens + collagen · 140kcal P15 C10 F3
 
-// ---- edit this list to change kinds, labels, colours, icons and which ones get a button
+// ---- edit this list to change kinds, labels, icons and which ones get a button.
+// Colours come from the active theme (--k-<kind> in the CSS); the hex after the comma is the fallback.
 const KINDS = {
-  woke:  { label: "Woke up", color: "#ffb23f", icon: "sunrise", button: true },
-  walk:  { label: "Walk",    color: "#3ff2e0", icon: "walk",    button: true },
-  gym:   { label: "Gym",     color: "#9e5cff", icon: "dumbbell", button: true },
-  meal:  { label: "Meal",    color: "#ff4fa8", icon: "food",    button: true },
-  done:  { label: "Done",    color: "#3dff8e", icon: "check",   button: true },
-  sleep: { label: "Sleep",   color: "#5b8cff", icon: "moon",    button: true },
-  water: { label: "Water",   color: "#3ff2e0", icon: "drop" },
-  sauna: { label: "Sauna",   color: "#ff1f3d", icon: "sun" },
-  cold:  { label: "Cold shower", color: "#3a7bff", icon: "snow" },
-  work:  { label: "Work",    color: "#ffb23f", icon: "briefcase" },
-  read:  { label: "Read",    color: "#9e5cff", icon: "book" },
-  meds:  { label: "Meds",    color: "#ff4fa8", icon: "pill" },
-  note:  { label: "Note",    color: "#8e89a8", icon: "pen" },
+  woke:  { label: "Woke up", color: "var(--k-woke, #ffb23f)", icon: "sunrise", button: true },
+  walk:  { label: "Walk",    color: "var(--k-walk, #3ff2e0)", icon: "walk",    button: true },
+  gym:   { label: "Gym",     color: "var(--k-gym, #9e5cff)", icon: "dumbbell", button: true },
+  meal:  { label: "Meal",    color: "var(--k-meal, #ff4fa8)", icon: "food",    button: true },
+  done:  { label: "Done",    color: "var(--k-done, #3dff8e)", icon: "check",   button: true },
+  sleep: { label: "Sleep",   color: "var(--k-sleep, #5b8cff)", icon: "moon",    button: true },
+  water: { label: "Water",   color: "var(--k-water, #3ff2e0)", icon: "drop" },
+  sauna: { label: "Sauna",   color: "var(--k-sauna, #ff1f3d)", icon: "sun" },
+  cold:  { label: "Cold shower", color: "var(--k-cold, #3a7bff)", icon: "snow" },
+  work:  { label: "Work",    color: "var(--k-work, #ffb23f)", icon: "briefcase" },
+  read:  { label: "Read",    color: "var(--k-read, #9e5cff)", icon: "book" },
+  meds:  { label: "Meds",    color: "var(--k-meds, #ff4fa8)", icon: "pill" },
+  note:  { label: "Note",    color: "var(--k-note, #8e89a8)", icon: "pen" },
 };
 const DAY_STARTS = 4; // entries before 04:00 count as the end of the previous evening
 
@@ -42,7 +43,7 @@ const ICONS = {
 const svg = (k, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICONS[k] || ICONS.pen}</svg>`;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
-const page = dv.current();
+const page = (typeof input === "object" && input && input.path) ? dv.page(input.path) : dv.current();
 const file = app.vault.getAbstractFileByPath(page.file.path);
 const root = dv.el("div", "", { cls: "xo-tl-wrap" });
 
@@ -116,7 +117,9 @@ entries.sort((a, b) => a.sortKey - b.sortKey);
 // ---------- render
 const tl = root.createDiv({ cls: "xo-tl" });
 if (!entries.length) tl.createDiv({ cls: "xo-muted", text: "Nothing logged yet. Tap a button above. It adds the time for you." });
-for (const e of entries) {
+const shown = (typeof input === "object" && input && input.limit) ? entries.slice(-input.limit) : entries;
+if (shown.length < entries.length) tl.createDiv({ cls: "xo-muted", text: `… ${entries.length - shown.length} earlier` });
+for (const e of shown) {
   const k = KINDS[e.kind];
   const row = tl.createDiv({ cls: "xo-tl-row" });
   row.style.setProperty("--c", k.color);

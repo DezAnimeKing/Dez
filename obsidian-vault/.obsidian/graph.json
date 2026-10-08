@@ -13,6 +13,13 @@
         "a": 1,
         "rgb": 4190944
       }
+    },
+    {
+      "query": "path:Projects",
+      "color": {
+        "a": 1,
+        "rgb": 16756027
+      }
     }
   ],
   "showTags": false,
