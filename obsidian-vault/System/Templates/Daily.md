@@ -5,6 +5,9 @@ cssclasses:
 ```dataviewjs
 await dv.view("System/Scripts/today")
 ```
+```dataviewjs
+await dv.view("System/Scripts/timeline")
+```
 
 ## Top 3
 - [ ] 
@@ -34,3 +37,5 @@ await dv.view("System/Scripts/today")
 
 ## Notes
 
+## Log
+%% tap a button above, or type:  06:30 walk Walk 7.5K · 1h20   (indent a line under it to add rows) %%

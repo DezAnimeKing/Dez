@@ -43,6 +43,16 @@ for i in range(27, -1, -1):
         else:
             lines.append(line)
     text = "\n".join(lines) + "\n"
+    log = [f"- 0{rng.randint(5, 7)}:{rng.randint(0, 5)}{rng.randint(0, 9)} woke"]
+    if rng.random() < 0.6:
+        log.append(f"- 07:{rng.randint(10, 50)} walk Walk {rng.choice(['5K', '6.5K', '7.5K'])} · {rng.choice(['45m', '1h', '1h20'])}")
+    if rng.random() < 0.5:
+        log += ["- 08:30 gym Back day · 30m", "  - 3x Chin-Up · 19 reps", "  - 4x Dumbbell Row · 42 reps",
+                "  - 2x Push-Up · 20 reps"]
+    log.append(f"- 12:{rng.randint(10, 50)} meal {rng.choice(['Chicken rice bowl · 620kcal P45 C70 F14', 'Greens + collagen · 140kcal P15 C10 F3', 'Ramen · 780kcal P30 C95 F28'])}")
+    if not is_today:
+        log.append(f"- 2{rng.randint(2, 3)}:{rng.randint(10, 50)} sleep")
+    text += "\n".join(log) + "\n"
     if not is_today or rng.random() < 1:
         mood = rng.choice([2, 3, 4, 4, 5, 3])
         text = text.replace(f"- [ ] {mood} ", f"- [x] {mood} ", 1)

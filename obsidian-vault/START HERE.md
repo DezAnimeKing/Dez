@@ -4,8 +4,9 @@
 1. **Open Obsidian.** It opens today's note automatically, already filled in.
 2. **Tap boxes.** Top 3 tasks, habits, and one mood.
 3. **Money:** type `12.50 groceries` under Money. Use `+1150 freelance` for money coming in.
-4. **Random thought?** Put it in [[Brain Dump]].
-5. Unfinished tasks from earlier days show up at the top of today's note as **Carried over**. Tick them there.
+4. **Timeline:** tap **Woke up / Walk / Gym / Meal / Done / Sleep** at the top. Each tap stamps the time. To add details first, type them in the box above the buttons (`Walk 7.5K · 1h20`, `Pasta · 650kcal P30 C80 F18`). Tap ⋮ on a card to edit it. Change the buttons, colours or icons at the top of `System/Scripts/timeline.js`.
+5. **Random thought?** Put it in [[Brain Dump]].
+6. Unfinished tasks from earlier days show up at the top of today's note as **Carried over**. Tick them there.
 
 That's the whole system. [[Home]] has your weekly numbers and the music player.
 
