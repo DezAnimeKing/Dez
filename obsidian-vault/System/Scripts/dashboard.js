@@ -37,27 +37,38 @@ const todayPath = `Daily/${today.toFormat("yyyy-MM-dd")}.md`;
 const tp = dv.page(todayPath);
 const days = dv.pages('"Daily"').where(p => p.file.day);
 const cc = app.customCss;
-const active = THEMES.find(t => cc && cc.enabledSnippets && cc.enabledSnippets.has(t.id)) || NEON;
+const enabled = new Set([...((cc && cc.enabledSnippets) || []), ...((app.vault.getConfig && app.vault.getConfig("enabledCssSnippets")) || [])]);
+const active = THEMES.find(t => enabled.has(t.id)) || NEON;
 const openToday = () => app.commands.executeCommandById("daily-notes");
 
 const root = dv.el("div", "", { cls: "xo-dash" });
 
 // ---------- cover, icon, title, theme switch
 const cover = root.createDiv({ cls: "xo-dash-cover" });
-const bannerFile = app.vault.getAbstractFileByPath("System/Assets/" + active.banner);
-if (bannerFile) cover.createEl("img", { attr: { src: app.vault.getResourcePath(bannerFile), alt: "" } });
-root.createDiv({ cls: "xo-dash-icon" }).innerHTML = svg(active.icon, 30);
+const bannerImg = cover.createEl("img", { attr: { alt: "" } });
+const iconTile = root.createDiv({ cls: "xo-dash-icon" });
 const head = root.createDiv({ cls: "xo-dash-head" });
-head.createDiv({ cls: "xo-dash-title" }).innerHTML = `<b><span>${esc(active.word)}</span></b> dashboard`;
+const titleEl = head.createDiv({ cls: "xo-dash-title" });
 const sw = head.createDiv({ cls: "xo-dash-themes" });
+const pills = new Map();
+// paint the header for a theme (also used right after a pill is clicked, so the page never shows a stale choice)
+const showTheme = t => {
+  const f = app.vault.getAbstractFileByPath("System/Assets/" + t.banner);
+  if (f) bannerImg.setAttribute("src", app.vault.getResourcePath(f));
+  iconTile.innerHTML = svg(t.icon, 30);
+  titleEl.innerHTML = `<b><span>${esc(t.word)}</span></b> dashboard`;
+  for (const [x, b] of pills) b.toggleClass("on", x === t);
+};
 for (const t of [...THEMES, NEON]) {
-  const b = sw.createEl("button", { text: t.label, cls: t === active ? "on" : "" });
+  const b = sw.createEl("button", { text: t.label });
+  pills.set(t, b);
   b.onclick = () => {
     if (!cc || !cc.setCssEnabledStatus) { new Notice("Switch themes in Settings ▸ Appearance ▸ CSS snippets."); return; }
     for (const x of THEMES) cc.setCssEnabledStatus(x.id, x.id === t.id);
-    setTimeout(() => app.workspace.trigger("dataview:refresh-views"), 150);
+    showTheme(t);
   };
 }
+showTheme(active);
 root.createDiv({ cls: "xo-dash-date", text: today.toFormat("cccc · d LLLL yyyy") });
 
 // ---------- stat chips

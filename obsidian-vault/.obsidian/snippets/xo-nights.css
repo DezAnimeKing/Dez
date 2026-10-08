@@ -361,7 +361,7 @@ progress.teal::-webkit-progress-value { background: linear-gradient(90deg, var(-
 .xo-card-h .t { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.78em; letter-spacing: 0.14em; text-transform: uppercase; color: var(--xo-text); }
 .xo-card-h .t svg { color: var(--xo-accent); }
 .xo-card-h .n { font-family: var(--font-mono); font-size: 0.75em; color: var(--xo-muted); }
-.xo-card ul.contains-task-list { margin: 2px 0; padding-left: 2px; }
+.xo-card ul.contains-task-list { margin: 2px 0; padding-left: 0; padding-inline-start: 1.7em !important; }
 .xo-card .task-list-item { margin: 3px 0; }
 .xo-card progress { height: 6px; margin: 4px 0 10px; }
 .xo-card .xo-btns button, .xo-dash-links button { font-size: 0.8em; }
@@ -369,7 +369,7 @@ progress.teal::-webkit-progress-value { background: linear-gradient(90deg, var(-
 .xo-dash-links button { justify-content: flex-start; text-align: left; width: 100%; background: var(--xo-panel-2) !important;
   border: 1px solid var(--xo-line) !important; color: var(--xo-text) !important; box-shadow: none !important; }
 .xo-dash-links button:hover { border-color: var(--xo-accent) !important; }
-.xo-board { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+.xo-board { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; padding-bottom: 4px; }
 .xo-col-h { font-family: var(--font-mono); font-size: 0.72em; letter-spacing: 0.12em; text-transform: uppercase; display: inline-block;
   padding: 2px 8px; border-radius: 6px; margin-bottom: 6px; color: var(--c); background: color-mix(in srgb, var(--c) 14%, transparent); }
 .xo-kcard { background: var(--xo-panel-2); border: 1px solid var(--xo-line); border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-size: 0.88em; }
@@ -389,3 +389,27 @@ progress.teal::-webkit-progress-value { background: linear-gradient(90deg, var(-
 .xo-kcard a.internal-link { color: var(--xo-text) !important; border-bottom: 0; text-decoration: none; font-weight: 500; }
 .xo-kcard a.internal-link:hover { color: var(--xo-accent) !important; }
 @media (max-width: 760px) { .xo-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- fit & finish ---------- */
+.xo-card { overflow: hidden; }
+.xo-card .task-list-item { overflow-wrap: anywhere; }
+.xo-card .task-list-item-checkbox { flex-shrink: 0; }
+.xo-dash input[type="text"], .xo-dash input:not([type]), .xo-tl-detail, .xo-player input, .xo-new input {
+  background: var(--xo-panel-2) !important; border: 1px solid var(--xo-line) !important; color: var(--xo-text) !important;
+  border-radius: 8px !important; padding: 6px 10px !important; height: auto !important; box-shadow: none !important; }
+.xo-dash input::placeholder, .xo-tl-detail::placeholder, .xo-player input::placeholder { color: var(--xo-faint); }
+.xo-dash input:focus, .xo-tl-detail:focus, .xo-player input:focus { border-color: var(--xo-accent) !important; outline: none; }
+.xo-kcard { min-width: 0; }
+.xo-kcard a.internal-link { display: block; overflow-wrap: anywhere; }
+.xo-kcard .k-row { flex-wrap: wrap; gap: 4px; }
+.xo-kcard .k-row span { flex: 1 1 auto; }
+.xo-col-h { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.xo-dash-head, .xo-dash-date, .xo-dash-stats { padding-left: 4px; }
+.xo-dash-title { overflow: visible; padding-left: 2px; }
+/* no code-block frame around dashboard / daily widgets in Live Preview */
+.dashboard .cm-embed-block, .kissland .cm-embed-block, .dashboard .block-language-dataviewjs {
+  border: 0 !important; box-shadow: none !important; background: transparent !important; }
+.dashboard .cm-embed-block:hover, .kissland .cm-embed-block:hover { box-shadow: none !important; }
+.dashboard .edit-block-button, .kissland .edit-block-button { opacity: 0; }
+.dashboard .cm-embed-block:hover .edit-block-button, .kissland .cm-embed-block:hover .edit-block-button { opacity: 0.5; }
+.xo-dash, .xo-dash *, .xo-tl-wrap, .xo-tl-wrap *, .xo-player * { box-sizing: border-box; }
