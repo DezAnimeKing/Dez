@@ -1,23 +1,24 @@
 # START HERE
 
-If this page looks plain (white or grey text, no neon), Obsidian hasn't loaded the vault's settings yet. Fix it like this:
+## How to use it
+1. **Open Obsidian.** It opens today's note automatically, already filled in.
+2. **Tap boxes.** Top 3 tasks, habits, and one mood.
+3. **Money:** type `12.50 groceries` under Money. Use `+1150 freelance` for money coming in.
+4. **Random thought?** Put it in [[Brain Dump]].
+5. Unfinished tasks from earlier days show up at the top of today's note as **Carried over**. Tick them there.
 
-## 1 · Open the right folder
-Obsidian ▸ vault switcher (bottom-left) ▸ **Open folder as vault** ▸ pick the folder that **contains this file** (`XO-Nights`).
-It must be the folder with the hidden `.obsidian` folder inside. A parent folder or a fresh "Create new vault" will not work.
-Then fully quit and reopen Obsidian once.
+That's the whole system. [[Home]] has your weekly numbers and the music player.
 
-## 2 · Turn on the plugins
-Settings ▸ **Community plugins** ▸ **Turn on community plugins** (exit Restricted mode).
-Then switch on: Dataview · Tasks · Calendar · Heatmap Calendar · Homepage.
+## Excel (on your PC, whenever you like)
+Close the workbooks, then double-click `System/Sync/sync.bat` (Windows) or `sync.command` (Mac). [[Sync with Excel|Details]].
 
-## 3 · Turn on the theme
-Settings ▸ **Appearance**
-- Base color scheme: **Dark**
-- CSS snippets ▸ press the ↻ reload icon ▸ switch on **xo-nights**
+## If the neon theme isn't showing
+1. Obsidian ▸ **Open folder as vault** ▸ pick the folder that contains this note (it has a hidden `.obsidian` folder).
+2. Settings ▸ **Community plugins** ▸ turn on, then enable Dataview, Calendar, Heatmap Calendar, Homepage.
+3. Settings ▸ **Appearance** ▸ Dark, then CSS snippets ▸ ↻ ▸ turn on **xo-nights**.
 
-## Still nothing?
-- **Mac:** press `Cmd + Shift + .` in Finder. If you can't see a `.obsidian` folder next to this file, your unzip tool skipped it. Unzip again with Archive Utility.
-- **Windows:** File Explorer ▸ View ▸ Show ▸ Hidden items, and check that `.obsidian` is next to this file. Unzip with "Extract All…".
-- **iPhone / iPad / Android:** copying through the Files app often drops the hidden `.obsidian` folder. Set the vault up on a computer first, then sync it with Obsidian Sync, iCloud Drive (iOS) or Syncthing (Android).
-- After you've seen the neon theme once, open [[Home]], and you can delete this note.
+**Phone:** sync this folder from your PC (Obsidian Sync, iCloud Drive or Syncthing). Copying with the Files app drops the hidden `.obsidian` folder.
+
+## Change things
+- **Habits:** edit the list in `System/Templates/Daily.md`. Keep the names the same as the Excel Habit Tracker so they sync.
+- **Colours per note:** `cssclasses: after-hours`, `dawn-fm`, `kissland` or `terminal`.

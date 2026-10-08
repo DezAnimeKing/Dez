@@ -257,15 +257,10 @@ progress.teal::-webkit-progress-value { background: linear-gradient(90deg, var(-
 
 /* file explorer: neon colour per top-level folder (like a lit sign board) */
 .nav-folder-title { font-family: var(--font-mono); letter-spacing: 0.04em; }
-.nav-folder-title[data-path^="00"] { color: var(--kl-sakura); }
-.nav-folder-title[data-path^="01"] { color: var(--kl-pink); }
-.nav-folder-title[data-path^="02"] { color: var(--ah-red); }
-.nav-folder-title[data-path^="03"] { color: var(--dfm-teal); }
-.nav-folder-title[data-path^="04"] { color: var(--amber); }
-.nav-folder-title[data-path^="05"] { color: var(--kl-violet); }
-.nav-folder-title[data-path^="06"] { color: var(--dfm-blue); }
-.nav-folder-title[data-path^="99"] { color: var(--xo-faint); }
-.nav-folder-title[data-path^="0"]:hover, .nav-file-title:hover { text-shadow: 0 0 8px currentColor; }
+.nav-folder-title[data-path="Daily"] { color: var(--kl-pink); }
+.nav-folder-title[data-path="Notes"] { color: var(--dfm-teal); }
+.nav-folder-title[data-path="System"] { color: var(--xo-faint); }
+.nav-folder-title:hover, .nav-file-title:hover { text-shadow: 0 0 8px currentColor; }
 .nav-file-title.is-active { color: #fff; box-shadow: inset 2px 0 0 var(--xo-accent); }
 
 /* calendar plugin */
@@ -279,3 +274,23 @@ progress.teal::-webkit-progress-value { background: linear-gradient(90deg, var(-
   background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 3px);
 }
 .workspace-leaf-content[data-type="markdown"] .view-content { position: relative; }
+
+/* ---------- simple mode: big tap targets, calm daily note ---------- */
+.markdown-rendered input[type=checkbox], .markdown-source-view input.task-list-item-checkbox { width: 1.15em; height: 1.15em; }
+.markdown-source-view .HyperMD-list-line, .markdown-rendered li { padding-top: 2px; padding-bottom: 2px; }
+.xo-strip { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+.xo-chip { font-family: var(--font-mono); font-size: 0.85em; padding: 4px 10px; border-radius: 999px;
+  border: 1px solid var(--xo-line); background: var(--xo-panel); color: var(--xo-text); white-space: nowrap; }
+.xo-chip b { color: var(--xo-accent); font-weight: 400; }
+.xo-chip.red { border-color: rgba(255,31,61,.5); } .xo-chip.teal { border-color: rgba(63,242,224,.5); }
+.xo-chip.pink { border-color: rgba(255,79,168,.5); } .xo-chip.amber { border-color: rgba(255,178,63,.5); }
+.xo-big { display: block; text-align: center; padding: 14px; margin: 8px 0; border-radius: 8px; font-family: var(--font-display);
+  letter-spacing: .15em; text-transform: uppercase; text-decoration: none !important; border: 1px solid var(--xo-accent) !important;
+  color: #fff !important; background: linear-gradient(90deg, rgba(255,31,61,.25), rgba(158,92,255,.25));
+  box-shadow: 0 0 18px var(--xo-glow); }
+.xo-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.xo-btns button { font-family: var(--font-mono); border: 1px solid var(--kl-pink); background: var(--xo-panel); color: var(--xo-text); }
+.xo-btns button.on { background: var(--kl-pink); color: var(--xo-black); }
+.xo-player iframe { width: 100%; border: 0; border-radius: 12px; }
+.xo-player input { width: 100%; font-family: var(--font-mono); }
+.xo-muted { color: var(--xo-muted); font-size: .85em; }

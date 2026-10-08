@@ -1,45 +1,17 @@
 {
   "colorGroups": [
     {
-      "query": "path:\"01 Daily\"",
+      "query": "path:Daily",
       "color": {
         "a": 1,
         "rgb": 16732072
       }
     },
     {
-      "query": "path:\"02 Tasks\"",
-      "color": {
-        "a": 1,
-        "rgb": 16719677
-      }
-    },
-    {
-      "query": "path:\"03 Money\"",
+      "query": "path:Notes",
       "color": {
         "a": 1,
         "rgb": 4190944
-      }
-    },
-    {
-      "query": "path:\"04 Habits\"",
-      "color": {
-        "a": 1,
-        "rgb": 16757311
-      }
-    },
-    {
-      "query": "path:\"05 Goals\"",
-      "color": {
-        "a": 1,
-        "rgb": 10378495
-      }
-    },
-    {
-      "query": "path:\"06 Listening Room\"",
-      "color": {
-        "a": 1,
-        "rgb": 3832831
       }
     }
   ],

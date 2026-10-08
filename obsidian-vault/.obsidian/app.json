@@ -1,13 +1,13 @@
 {
   "alwaysUpdateLinks": true,
   "newFileLocation": "folder",
-  "newFileFolderPath": "00 Inbox",
-  "attachmentFolderPath": "99 System/Assets",
+  "newFileFolderPath": "Notes",
+  "attachmentFolderPath": "System/Assets",
   "readableLineLength": true,
   "showLineNumber": false,
   "showInlineTitle": true,
   "promptDelete": true,
-  "defaultViewMode": "preview",
+  "defaultViewMode": "source",
   "livePreview": true,
-  "propertiesInDocument": "visible"
+  "propertiesInDocument": "hidden"
 }

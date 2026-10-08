@@ -1,14 +1,14 @@
 {
   "main": {
-    "id": "9cbc9c9a072ede55",
+    "id": "039aea9dda30aa89",
     "type": "split",
     "children": [
       {
-        "id": "6fd586726ea73cd6",
+        "id": "c4f88f5d1c7a5e40",
         "type": "tabs",
         "children": [
           {
-            "id": "9828f26ebc56be15",
+            "id": "16144b30c2f24006",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -25,15 +25,15 @@
     "direction": "vertical"
   },
   "left": {
-    "id": "39069bf8591d973b",
+    "id": "975451c8341e0ba6",
     "type": "split",
     "children": [
       {
-        "id": "3e8764157df1e6fe",
+        "id": "c92afa38d8d0d60d",
         "type": "tabs",
         "children": [
           {
-            "id": "c0a7d4c033a98b98",
+            "id": "41cae9f6c814f243",
             "type": "leaf",
             "state": {
               "type": "file-explorer",
@@ -43,22 +43,7 @@
             }
           },
           {
-            "id": "c211aef4c81de574",
-            "type": "leaf",
-            "state": {
-              "type": "search",
-              "state": {
-                "query": "",
-                "matchingCase": false,
-                "explainSearch": false,
-                "collapseAll": false,
-                "extraContext": false,
-                "sortOrder": "alphabetical"
-              }
-            }
-          },
-          {
-            "id": "03a1947b5bd376b2",
+            "id": "dc08ec3c648533c7",
             "type": "leaf",
             "state": {
               "type": "bookmarks",
@@ -66,37 +51,21 @@
             }
           }
         ]
-      },
-      {
-        "id": "ae55c4a64500a87a",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "a6a656a25879f1d1",
-            "type": "leaf",
-            "state": {
-              "type": "outline",
-              "state": {
-                "file": "Home.md"
-              }
-            }
-          }
-        ]
       }
     ],
     "direction": "horizontal",
-    "width": 270
+    "width": 240
   },
   "right": {
-    "id": "9ce58b067241f975",
+    "id": "f8637c588e2a9f82",
     "type": "split",
     "children": [
       {
-        "id": "5a027f14c22a1398",
+        "id": "d11d84e09bfc4dd4",
         "type": "tabs",
         "children": [
           {
-            "id": "7d5caf8d105c9082",
+            "id": "c6917944b44ec932",
             "type": "leaf",
             "state": {
               "type": "calendar",
@@ -104,63 +73,15 @@
             }
           }
         ]
-      },
-      {
-        "id": "9b0a827c23306e6d",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "a9538db59fd5271e",
-            "type": "leaf",
-            "state": {
-              "type": "localgraph",
-              "state": {
-                "file": "Home.md",
-                "options": {
-                  "collapse-filter": true,
-                  "search": "",
-                  "localJumps": 2,
-                  "localBacklinks": true,
-                  "localForelinks": true,
-                  "localInterlinks": true,
-                  "showTags": false,
-                  "showAttachments": false,
-                  "hideUnresolved": true,
-                  "collapse-color-groups": true,
-                  "showArrow": false,
-                  "nodeSizeMultiplier": 1,
-                  "lineSizeMultiplier": 1
-                }
-              }
-            }
-          }
-        ]
-      },
-      {
-        "id": "ec31615054cc5bb3",
-        "type": "tabs",
-        "children": [
-          {
-            "id": "aa10d060a3484b21",
-            "type": "leaf",
-            "state": {
-              "type": "tag",
-              "state": {
-                "sortOrder": "frequency",
-                "useHierarchy": true
-              }
-            }
-          }
-        ]
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 280
   },
   "left-ribbon": {
     "hiddenItems": {}
   },
-  "active": "9828f26ebc56be15",
+  "active": "16144b30c2f24006",
   "lastOpenFiles": [
     "Home.md"
   ]

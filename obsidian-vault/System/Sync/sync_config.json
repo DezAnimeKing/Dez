@@ -1,0 +1,23 @@
+{
+  "budget_workbook": "Excel/Ultimate_Budget_Planner.xlsx",
+  "tasks_workbook": "Excel/Task_Habit_Tracker.xlsx",
+  "daily_folder": "Daily",
+  "exclude_folders": [
+    "System",
+    ".obsidian",
+    ".trash",
+    "Excel"
+  ],
+  "generated_notes": [
+    "System/Sync/Budget Snapshot.md",
+    "System/Sync/Excel Agenda.md"
+  ],
+  "default_account": "Credit Card 1",
+  "push_to_excel": true,
+  "pull_from_excel": true,
+  "backup": true,
+  "snapshot_note": "System/Sync/Budget Snapshot.md",
+  "agenda_note": "System/Sync/Excel Agenda.md",
+  "default_income": "Side Hustle",
+  "default_income_account": "Checking 1"
+}
